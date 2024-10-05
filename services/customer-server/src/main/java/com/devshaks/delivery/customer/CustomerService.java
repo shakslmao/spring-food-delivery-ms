@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -13,7 +15,7 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
 
     public String createCustomer(@Valid CustomerRequest customerRequest) {
-        var customer = customerRepository.save(customerMapper.toCustomer(customerRequest));
+        var customer = customerRepository.save(customerMapper.mapCustomerToRequest(customerRequest));
         return customer.getId();
     }
 
@@ -24,7 +26,11 @@ public class CustomerService {
     }
 
     private  void updateCustomerCredentials(Customer customer, CustomerRequest customerRequest) {
-        if (StringUtils.isNotBlank(customerRequest.email())) {
+        if (StringUtils.isNotBlank(customerRequest.username())) {
+            customer.setUsername(customerRequest.username());
+        }
+
+        if (StringUtils.isNotBlank(customerRequest.firstName())) {
             customer.setFirstName(customerRequest.firstName());
         }
 
@@ -43,10 +49,12 @@ public class CustomerService {
         if (customerRequest.address() != null) {
             customer.setAddress(customerRequest.address());
         }
-
-
-
     }
 
-
+    public List<CustomerResponse> findAllCustomers() {
+        return customerRepository.findAll()
+                .stream()
+                .map(customerMapper::mapCustomerToResponse)
+                .toList();
+    }
 }
