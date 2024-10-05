@@ -7,14 +7,16 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="configuration-server" />
+        <module name="apigateway" />
         <module name="discovery-server" />
         <module name="customer-server" />
+        <module name="configuration-server" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="apigateway" options="-parameters" />
       <module name="configuration-server" options="-parameters" />
       <module name="customer-server" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
