@@ -19,4 +19,7 @@
       <module name="apigateway" options="-parameters" />
       <module name="configuration-server" options="-parameters" />
       <module name="customer-server" options="-parameters" />
-      <m
+      <module name="discovery-server" options="-parameters" />
+    </option>
+  </component>
+</project>
