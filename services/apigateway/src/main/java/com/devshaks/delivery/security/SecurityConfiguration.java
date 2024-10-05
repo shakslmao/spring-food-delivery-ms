@@ -15,11 +15,4 @@ public class SecurityConfiguration {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity) {
         serverHttpSecurity.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-                        .pathMatchers(("(/eureka/**"))
-                        .permitAll()
-                        .anyExchange()
-                        .authenticated())
-                .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec.jwt(Customizer.withDefaults()));
-        return serverHttpSecurity.build();
-    }
-}
+                        .pathMatchers(("(/eureka/*

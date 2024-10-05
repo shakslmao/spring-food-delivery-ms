@@ -3,6 +3,7 @@ package com.devshaks.delivery.customer;
 import com.devshaks.delivery.customer.exceptions.CustomerNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
