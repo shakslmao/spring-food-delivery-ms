@@ -10,6 +10,7 @@
         <module name="apigateway" />
         <module name="discovery-server" />
         <module name="customer-server" />
+        <module name="restaurant-server" />
         <module name="configuration-server" />
       </profile>
     </annotationProcessing>
@@ -20,6 +21,7 @@
       <module name="configuration-server" options="-parameters" />
       <module name="customer-server" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
+      <module name="restaurant-server" options="-parameters" />
     </option>
   </component>
 </project>
