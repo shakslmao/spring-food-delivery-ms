@@ -1,5 +1,6 @@
 package com.devshaks.delivery.customer;
 
+import com.devshaks.delivery.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,5 +60,22 @@ public class CustomerController {
         customerService.deleteCustomerById(customerId);
         return ResponseEntity.accepted().build();
     }
-    
+
+    // TODO:
+    // Add a Restaurant to a customers favourite list
+    @PostMapping("/{customer-id}/favourite-restaurant/")
+    public ResponseEntity<String> addRestaurantToFavourites(@PathVariable("customer-id")  String customerId) {
+        return null;
+    }
+
+    // remove a restaurant from a customers favourite list
+    @DeleteMapping("/{customer-id}/favourite-restaurant/{restaurant-id}")
+    public ResponseEntity<String> removeRestaurantFromCustomerFavourites(@PathVariable("customer-id") String customerId, @PathVariable("restaurant-id") String restaurantId) {
+        return null;
+    }
+
+    @GetMapping("/{customer-id}/favourite-restaurants")
+    public ResponseEntity<List<RestaurantResponse>> retrieveFavouriteRestaurants(@PathVariable("customer-id") String customerId) {
+        return null;
+    }
 }
