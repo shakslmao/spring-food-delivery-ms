@@ -1,33 +1,50 @@
 package com.devshaks.delivery.customer;
 
 import com.devshaks.delivery.customer.exceptions.CustomerNotFoundException;
+import com.devshaks.delivery.customer.handlers.UnauthorizedException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
     // Method to create a new customer
     public String createCustomer(@Valid CustomerRequest customerRequest) {
-        // Map the incoming customer request to a customer entity and save it to the repository
-        var customer = customerRepository.save(customerMapper.mapCustomerToRequest(customerRequest));
-        // Return the ID of the newly created customer
-        return customer.getId();
+        try {
+            // Map the incoming customer request to a customer entity and save it to the repository
+            var customer = customerRepository.save(customerMapper.mapCustomerToRequest(customerRequest));
+            // Return the ID of the newly created customer
+            return customer.getId();
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                log.error("Unauthorized access to create customer: {}", e.getMessage());
+                throw new UnauthorizedException("Unauthorized access to create customer", e);
+            }
+            throw e;
+        } catch (Exception e) {
+            log.error("Error creating customer: {}", e.getMessage());
+            throw new RuntimeException("Error creating customer", e);
+        }
     }
 
     // Method to update an existing customer
     public void updateCustomer(@Valid CustomerRequest customerRequest) {
         // Find the customer by ID, throw an exception if not found
         var customer = customerRepository.findById(customerRequest.id())
-            .orElseThrow(() -> new CustomerNotFoundException("Customer With Id: " + customerRequest.id() + " Not Found"));
+                .orElseThrow(() -> new CustomerNotFoundException("Customer With Id: " + customerRequest.id() + " Not Found"));
         // Update the customer's details based on the provided request
         updateCustomerCredentials(customer, customerRequest);
         // Save the updated customer entity back to the repository
@@ -92,5 +109,4 @@ public class CustomerService {
         // Delete the customer by ID
         customerRepository.deleteById(customerId);
     }
-
 }
