@@ -18,7 +18,7 @@ public class RestaurantController {
 
     @PostMapping
     public ResponseEntity<Void> createRestaurant(@RequestBody @Valid RestaurantRequest restaurantRequest) {
-        String restaurantId = restaurantService.createRestaurant(restaurantRequest);
+        Integer restaurantId = restaurantService.createRestaurant(restaurantRequest);
         URI location = URI.create("/api/v1/restaurants/" + restaurantId);
         return ResponseEntity.created(location).build();
     }
