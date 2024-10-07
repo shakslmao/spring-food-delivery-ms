@@ -3,7 +3,4 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/food-delivery-microservice.iml" filepath="$PROJECT_DIR$/.idea/food-delivery-microservice.iml" />
-      <module fileurl="file://$PROJECT_DIR$/services/restaurant-server/restaurant-server.iml" filepath="$PROJECT_DIR$/services/restaurant-server/restaurant-server.iml" />
-    </modules>
-  </component>
-</project>
+      <module fileurl="file://$PROJECT_D

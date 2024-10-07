@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -19,19 +20,23 @@ public class CustomerController {
     private final CustomerService customerService;
 
     // Endpoint to create a new customer
+    // Create a new customer and return 201 Created with the location header
     @PostMapping
-    public ResponseEntity<String> createCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
+    public ResponseEntity<Void> createCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
         // Call the customer service to create the customer and return the customer's ID in the response
-        return ResponseEntity.ok(customerService.createCustomer(customerRequest));
+        String customerId = customerService.createCustomer(customerRequest);
+        URI location = URI.create("/api/v1/customers/" + customerId);
+        return ResponseEntity.created(location).build();
     }
 
     // Endpoint to update an existing customer
-    @PutMapping
-    public ResponseEntity<Void> updateCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
+    // Update an existing customer and return 204 No Content
+    @PutMapping("/{customer-id}")
+    public ResponseEntity<Void> updateCustomer(@PathVariable("customer-id") String customerId, @RequestBody @Valid CustomerRequest customerRequest) {
         // Call the customer service to update the customer
-        customerService.updateCustomer(customerRequest);
+        customerService.updateCustomer(customerId, customerRequest);
         // Return a 200 OK status with no content
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     // Endpoint to retrieve all customers
@@ -42,40 +47,46 @@ public class CustomerController {
     }
 
     // Endpoint to check if a customer exists by ID
-    @GetMapping("/existing-customer/{customer-id}")
+    @GetMapping("/{customer-id}")
     public ResponseEntity<Boolean> existingCustomerById(@PathVariable("customer-id") String customerId) {
         // Call the customer service to check if the customer exists and return the result in the response
-        return ResponseEntity.ok(customerService.existingCustomerById(customerId));
+        if (customerService.existingCustomerById(customerId)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
     // Endpoint to find a customer by their ID
     @GetMapping("/{customer-id}")
-    public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customer-id") String customerId) { 
-        return ResponseEntity.ok(customerService.findCustomerById(customerId));   
+    public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customer-id") String customerId) {
+        return ResponseEntity.ok(customerService.findCustomerById(customerId));
     }
 
     // Endpoint to delete a customer by their ID
     @DeleteMapping("/{customer-id}")
     public ResponseEntity<Void> deleteCustomerById(@PathVariable("customer-id") String customerId) {
         customerService.deleteCustomerById(customerId);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.noContent().build();
     }
 
-    // TODO:
-    // Add a Restaurant to a customers favourite list
-    @PostMapping("/{customer-id}/favourite-restaurant/")
-    public ResponseEntity<String> addRestaurantToFavourites(@PathVariable("customer-id")  String customerId) {
-        return null;
+    // TODO: Implement the following endpoints
+    // Add a Restaurant to a customer's favourite list
+    @PostMapping("/{customer-id}/favorite-restaurant/{restaurant-id}")
+    public ResponseEntity<Void> addRestaurantToFavourites(@PathVariable("customer-id") String customerId, @PathVariable("restaurant-id") String restaurantId) {
+        customerService.addRestaurantToFavourites(customerId, restaurantId);
+        return ResponseEntity.noContent().build();
     }
 
     // remove a restaurant from a customers favourite list
     @DeleteMapping("/{customer-id}/favourite-restaurant/{restaurant-id}")
-    public ResponseEntity<String> removeRestaurantFromCustomerFavourites(@PathVariable("customer-id") String customerId, @PathVariable("restaurant-id") String restaurantId) {
-        return null;
+    public ResponseEntity<Void> removeRestaurantFromCustomerFavourites(@PathVariable("customer-id") String customerId, @PathVariable("restaurant-id") String restaurantId) {
+       customerService.removeRestaurantFromCustomerFavourites(customerId, restaurantId);
+       return ResponseEntity.noContent().build();
     }
 
+    // Retrieve a customer's favorite restaurants
     @GetMapping("/{customer-id}/favourite-restaurants")
     public ResponseEntity<List<RestaurantResponse>> retrieveFavouriteRestaurants(@PathVariable("customer-id") String customerId) {
-        return null;
+        return ResponseEntity.ok(customerService.retrieveFavouriteRestaurants(customerId));
     }
 }

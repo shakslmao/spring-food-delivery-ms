@@ -2,12 +2,11 @@ package com.devshaks.delivery.customer;
 
 import com.devshaks.delivery.customer.exceptions.CustomerNotFoundException;
 import com.devshaks.delivery.customer.handlers.UnauthorizedException;
+import com.devshaks.delivery.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -41,7 +40,7 @@ public class CustomerService {
     }
 
     // Method to update an existing customer
-    public void updateCustomer(@Valid CustomerRequest customerRequest) {
+    public void updateCustomer(String customerId, @Valid CustomerRequest customerRequest) {
         // Find the customer by ID, throw an exception if not found
         var customer = customerRepository.findById(customerRequest.id())
                 .orElseThrow(() -> new CustomerNotFoundException("Customer With Id: " + customerRequest.id() + " Not Found"));
@@ -108,5 +107,18 @@ public class CustomerService {
     public void deleteCustomerById(String customerId) {
         // Delete the customer by ID
         customerRepository.deleteById(customerId);
+    }
+
+    // TODO: Implement the following methods
+
+    public void addRestaurantToFavourites(String customerId, String restaurantId) {
+
+    }
+
+    public void removeRestaurantFromCustomerFavourites(String customerId, String restaurantId) {
+    }
+
+    public List<RestaurantResponse> retrieveFavouriteRestaurants(String customerId) {
+        return null;
     }
 }
