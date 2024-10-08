@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@Table(name = "restaurants")
 public class Restaurant {
 
     @Id

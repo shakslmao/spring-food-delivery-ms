@@ -10,7 +10,6 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@Table(name = "cuisine_types")
 public class CuisineTypes {
 
     @Id
@@ -23,7 +22,7 @@ public class CuisineTypes {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "NUMERIC")
     private Double price;
 
     @ManyToOne

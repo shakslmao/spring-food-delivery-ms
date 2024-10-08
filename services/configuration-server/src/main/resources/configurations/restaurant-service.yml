@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/restaurant
+    url: jdbc:postgresql://localhost:5432/restaurantdb
     username: root
     password: root
     driver-class-name: org.postgresql.Driver
@@ -10,6 +10,7 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   flyway:
+    repair-on-migrate: true
     baseline-on-migrate: true
     enabled: true
     baseline-description: "init"

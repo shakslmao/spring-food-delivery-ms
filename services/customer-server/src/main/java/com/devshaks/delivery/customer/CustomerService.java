@@ -97,12 +97,6 @@ public class CustomerService {
         return customerRepository.findById(customerId).isPresent();
     }
 
-    // Method to find a customer by their ID
-    public CustomerResponse findCustomerById(String customerId) {
-        // Returns the customer Response if the customer exits, if not it throws an exception
-        return customerRepository.findById(customerId).map(customerMapper::mapCustomerToResponse).orElseThrow(() -> new CustomerNotFoundException("Customer With Id: " + customerId + " Not Found"));
-    }
-
     // Method to delete a customer by their ID
     public void deleteCustomerById(String customerId) {
         // Delete the customer by ID

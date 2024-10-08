@@ -56,12 +56,6 @@ public class CustomerController {
         return ResponseEntity.notFound().build();
     }
 
-    // Endpoint to find a customer by their ID
-    @GetMapping("/{customer-id}")
-    public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customer-id") String customerId) {
-        return ResponseEntity.ok(customerService.findCustomerById(customerId));
-    }
-
     // Endpoint to delete a customer by their ID
     @DeleteMapping("/{customer-id}")
     public ResponseEntity<Void> deleteCustomerById(@PathVariable("customer-id") String customerId) {
