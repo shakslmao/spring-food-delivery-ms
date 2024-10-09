@@ -1,4 +1,10 @@
 package com.devshaks.delivery.restaurant;
 
-public record RestaurantPurchaseRequest() {
+import jakarta.validation.constraints.NotNull;
+
+public record RestaurantPurchaseRequest(
+        @NotNull(message = "Restaurant is Required") Integer restaurantId,
+        @NotNull(message = "Cuisine is Required") Integer cuisineId
+
+) {
 }

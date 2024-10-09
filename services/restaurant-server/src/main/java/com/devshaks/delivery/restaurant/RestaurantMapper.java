@@ -28,6 +28,16 @@ public class RestaurantMapper {
                 .priceRange(restaurantRequest.priceRange())
                 .cuisineTypes(cuisineTypes)
                 .build();
-
     }
+
+    public RestaurantPurchaseResponse toRestaurantPurchaseResponse(Restaurant restaurant, CuisineTypes cuisineTypes) {
+        return new RestaurantPurchaseResponse(
+                restaurant.getId(),
+                restaurant.getName(),
+                restaurant.getAddress(),
+                restaurant.getDescription(),
+                cuisineTypes
+        );
+    }
+
 }
