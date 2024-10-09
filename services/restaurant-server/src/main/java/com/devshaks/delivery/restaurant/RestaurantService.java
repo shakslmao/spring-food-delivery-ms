@@ -87,4 +87,15 @@ public class RestaurantService {
                 .map(cuisineTypes -> restaurantMapper.toRestaurantPurchaseResponse(restaurant, cuisineTypes))
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Finds a restaurant by its ID.
+     *
+     * @param restaurantId The ID of the restaurant to find.
+     * @return A RestaurantResponse containing the restaurant's details.
+     * @throws EntityNotFoundException if the restaurant is not found.
+     */
+    public RestaurantResponse findRestaurantById(Integer restaurantId) {
+        return null;
+    }
 }

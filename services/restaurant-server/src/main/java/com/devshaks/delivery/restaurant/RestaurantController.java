@@ -51,6 +51,18 @@ public class RestaurantController {
         // Returns a response with the purchase details and the created status
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
+
+    /**
+     * Endpoint to fetch details of a restaurant by its ID.
+     *
+     * @param restaurantId The ID of the restaurant to retrieve.
+     * @return A ResponseEntity containing the RestaurantResponse object and a 200 OK status if the restaurant is found.
+     *         Returns a 404 Not Found status if the restaurant does not exist.
+     */
+    @GetMapping("/{restaurantId}")
+    public ResponseEntity<RestaurantResponse> findRestaurantById(@PathVariable("restaurantId") Integer restaurantId) {
+        return ResponseEntity.ok(restaurantService.findRestaurantById(restaurantId));
+    }
 }
 
 

@@ -30,6 +30,21 @@ public class RestaurantMapper {
                 .build();
     }
 
+    public RestaurantResponse toRestaurantResponse(Restaurant restaurant) {
+        return new RestaurantResponse(
+                restaurant.getId(),
+                restaurant.getName(),
+                restaurant.getAddress(),
+                restaurant.getContactNumber(),
+                restaurant.getLocation(),
+                restaurant.getDescription(),
+                restaurant.getOpeningHours(),
+                restaurant.getRating(),
+                restaurant.getIsOpen(),
+                restaurant.getPriceRange()
+        );
+    }
+
     public RestaurantPurchaseResponse toRestaurantPurchaseResponse(Restaurant restaurant, CuisineTypes cuisineTypes) {
         return new RestaurantPurchaseResponse(
                 restaurant.getId(),
@@ -39,5 +54,4 @@ public class RestaurantMapper {
                 cuisineTypes
         );
     }
-
 }
