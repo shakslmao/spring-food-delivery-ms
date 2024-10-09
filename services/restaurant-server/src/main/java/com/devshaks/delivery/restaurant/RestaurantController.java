@@ -2,7 +2,6 @@ package com.devshaks.delivery.restaurant;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,22 +13,44 @@ import java.util.List;
 @RequestMapping("/api/v1/restaurants")
 @RequiredArgsConstructor
 public class RestaurantController {
+
+    // Injects the RestaurantService to handle business logic
     private final RestaurantService restaurantService;
 
+    /**
+     * Endpoint to create a new restaurant.
+     *
+     * @param restaurantRequest A valid RestaurantRequest object containing the details of the restaurant to be created.
+     * @return A ResponseEntity with a URI location of the newly created restaurant and a 201 CREATED status.
+     */
     @PostMapping
     public ResponseEntity<Void> createRestaurant(@RequestBody @Valid RestaurantRequest restaurantRequest) {
+        // Calls the service to create a new restaurant and retrieve its ID
         Integer restaurantId = restaurantService.createRestaurant(restaurantRequest);
+
+        // Creates a URI that points to the newly created restaurant
         URI location = URI.create("/api/v1/restaurants/" + restaurantId);
+
+        // Returns a response with the created status and the restaurant location in the header
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Endpoint to handle a purchase request from a specific restaurant.
+     *
+     * @param restaurantId The ID of the restaurant where the purchase is being made.
+     * @param purchaseRequests A list of valid RestaurantPurchaseRequest objects specifying the cuisines being purchased.
+     * @return A ResponseEntity containing a list of RestaurantPurchaseResponse objects and a 201 CREATED status.
+     */
     @PostMapping("/{restaurantId}/purchase")
-    public ResponseEntity<List<RestaurantPurchaseResponse>> purchaseDelivery(@PathVariable("restaurantId") Integer restaurantId, @RequestBody @Valid List<RestaurantPurchaseRequest> purchaseRequests) {
+    public ResponseEntity<List<RestaurantPurchaseResponse>> purchaseDelivery(@PathVariable("restaurantId") Integer restaurantId,
+                                                                             @RequestBody @Valid List<RestaurantPurchaseRequest> purchaseRequests) {
+        // Calls the service to process the purchase and get a list of responses
         List<RestaurantPurchaseResponse> responses = restaurantService.purchaseDelivery(purchaseRequests, restaurantId);
+
+        // Returns a response with the purchase details and the created status
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
-
-    
-
-
 }
+
+
