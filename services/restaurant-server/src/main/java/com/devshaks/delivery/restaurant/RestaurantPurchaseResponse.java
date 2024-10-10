@@ -7,6 +7,5 @@ public record RestaurantPurchaseResponse(
         String restaurantName,
         String address,
         String description,
-        CuisineTypes cuisineType
-) {
+        CuisineTypes cuisineType) {
 }

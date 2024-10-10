@@ -10,6 +10,5 @@ public record RestaurantResponse(
         String openingHours,
         Double rating,
         Boolean isOpen,
-        String priceRange
-) {
+        String priceRange) {
 }

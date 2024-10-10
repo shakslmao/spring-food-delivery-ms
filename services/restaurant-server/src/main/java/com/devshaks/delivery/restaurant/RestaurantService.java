@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RestaurantService {
 
-    // Injects required dependencies for restaurant mapping, repository access, and cuisine management
+    // Injects required dependencies for restaurant mapping, repository access, and
+    // cuisine management
     private final RestaurantMapper restaurantMapper;
     private final RestaurantRepository restaurantRepository;
     private final CuisineTypesRepository cuisineTypesRepository;
@@ -24,7 +25,8 @@ public class RestaurantService {
     /**
      * Creates a new restaurant entity in the system based on the provided request.
      *
-     * @param restaurantRequest A valid RestaurantRequest containing restaurant details.
+     * @param restaurantRequest
+     *            A valid RestaurantRequest containing restaurant details.
      * @return The unique identifier (ID) of the newly created restaurant.
      */
     public Integer createRestaurant(@Valid RestaurantRequest restaurantRequest) {
@@ -36,20 +38,30 @@ public class RestaurantService {
     /**
      * Handles the purchase of cuisines from a specific restaurant.
      *
-     * @param restaurantPurchaseRequests A list of requests specifying the restaurant and cuisine(s) to be purchased.
-     * @param restaurantId The ID of the restaurant where the purchase is being made.
-     * @return A list of RestaurantPurchaseResponse objects containing the restaurant and cuisine details.
-     * @throws RestaurantPurchaseException If the requests are not for the same restaurant or the restaurant is not found.
-     * @throws CuisineNotFoundException If any requested cuisine does not exist or does not belong to the specified restaurant.
+     * @param restaurantPurchaseRequests
+     *            A list of requests specifying the restaurant and cuisine(s) to be
+     *            purchased.
+     * @param restaurantId
+     *            The ID of the restaurant where the purchase is being made.
+     * @return A list of RestaurantPurchaseResponse objects containing the
+     *         restaurant and cuisine details.
+     * @throws RestaurantPurchaseException
+     *             If the requests are not for the same restaurant or the restaurant
+     *             is not found.
+     * @throws CuisineNotFoundException
+     *             If any requested cuisine does not exist or does not belong to the
+     *             specified restaurant.
      */
-    public List<RestaurantPurchaseResponse> purchaseDelivery(List<RestaurantPurchaseRequest> restaurantPurchaseRequests, Integer restaurantId) {
+    public List<RestaurantPurchaseResponse> purchaseDelivery(List<RestaurantPurchaseRequest> restaurantPurchaseRequests,
+            Integer restaurantId) {
 
         // Validates that all the purchase requests are for the same restaurant
         if (restaurantPurchaseRequests.stream().anyMatch(request -> !request.restaurantId().equals(restaurantId))) {
             throw new RestaurantPurchaseException("All purchase requests must be for the same restaurant");
         }
 
-        // Attempts to fetch the restaurant from the repository, throws an exception if not found
+        // Attempts to fetch the restaurant from the repository, throws an exception if
+        // not found
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RestaurantPurchaseException("Restaurant not found"));
 
@@ -82,7 +94,8 @@ public class RestaurantService {
             }
         });
 
-        // Maps the fetched cuisines to their respective RestaurantPurchaseResponse objects
+        // Maps the fetched cuisines to their respective RestaurantPurchaseResponse
+        // objects
         return cuisines.stream()
                 .map(cuisineTypes -> restaurantMapper.toRestaurantPurchaseResponse(restaurant, cuisineTypes))
                 .collect(Collectors.toList());
@@ -91,11 +104,27 @@ public class RestaurantService {
     /**
      * Finds a restaurant by its ID.
      *
-     * @param restaurantId The ID of the restaurant to find.
+     * @param restaurantId
+     *            The ID of the restaurant to find.
      * @return A RestaurantResponse containing the restaurant's details.
-     * @throws EntityNotFoundException if the restaurant is not found.
+     * @throws EntityNotFoundException
+     *             if the restaurant is not found.
      */
     public RestaurantResponse findRestaurantById(Integer restaurantId) {
-        return null;
+        return restaurantRepository.findById(restaurantId)
+                .map(restaurantMapper::toRestaurantResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Restaurant not found"));
+    }
+
+    /**
+     * Fetches all restaurants in the system.
+     *
+     * @return A list of RestaurantResponse objects containing the details of all
+     *         restaurants.
+     */
+    public List<RestaurantResponse> findAllRestaurants() {
+        return restaurantRepository.findAll().stream().map(restaurantMapper::toRestaurantResponse)
+                .collect(Collectors.toList());
+
     }
 }

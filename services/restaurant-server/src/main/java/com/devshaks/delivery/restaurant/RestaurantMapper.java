@@ -41,8 +41,7 @@ public class RestaurantMapper {
                 restaurant.getOpeningHours(),
                 restaurant.getRating(),
                 restaurant.getIsOpen(),
-                restaurant.getPriceRange()
-        );
+                restaurant.getPriceRange());
     }
 
     public RestaurantPurchaseResponse toRestaurantPurchaseResponse(Restaurant restaurant, CuisineTypes cuisineTypes) {
@@ -51,7 +50,6 @@ public class RestaurantMapper {
                 restaurant.getName(),
                 restaurant.getAddress(),
                 restaurant.getDescription(),
-                cuisineTypes
-        );
+                cuisineTypes);
     }
 }
