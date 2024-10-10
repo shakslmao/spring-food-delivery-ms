@@ -17,4 +17,12 @@ import java.util.List;
 public class Customer {
     @Id
     private String id;
-    private String username
+    private String username;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
+    private Address address;
+
+    private List<FavouriteRestaurants> favouriteRestaurants;
+}

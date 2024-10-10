@@ -1,4 +1,4 @@
-package com.devshaks.delivery.restaurants;
+package com.devshaks.delivery.customer.restaurants;
 
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.constraints.NotNull;

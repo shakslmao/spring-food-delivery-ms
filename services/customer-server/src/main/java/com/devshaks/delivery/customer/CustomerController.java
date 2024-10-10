@@ -1,6 +1,6 @@
 package com.devshaks.delivery.customer;
 
-import com.devshaks.delivery.restaurants.RestaurantResponse;
+import com.devshaks.delivery.customer.restaurants.RestaurantRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,12 +69,30 @@ public class CustomerController {
     // TODO: Implement the following endpoints
     // Add a Restaurant to a customer's favourite list
     @PostMapping("/{customer-id}/favorite-restaurant/{restaurant-id}")
-    public ResponseEntity<Void> addRestaurantToFavourites(@PathVariable("customer-id") String customerId,
-            @PathVariable("restaurant-id") String restaurantId) {
-        customerService.addRestaurantToFavourites(customerId, restaurantId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> addRestaurantToFavourites(
+            @PathVariable("customer-id") String customerId,
+            @PathVariable("restaurant-id") String restaurantId,
+            @RequestBody @Valid RestaurantRequest restaurantRequest
+    ){
+        customerService.addRestaurantToFavourites(customerId, restaurantId, restaurantRequest);
+        URI location = URI.create("/api/v1/customers/ + customerId + /favourite-restaurant/" + restaurantId);
+        return ResponseEntity.created(location).build();
     }
 
+
+    /*
+    @PostMapping("/{customer-id}/favorite-restaurant/{restaurant-id}")
+    public ResponseEntity<Void> addRestaurantToFavourites(
+            @RequestBody @Valid RestaurantRequest restaurantRequest,
+            @PathVariable("customer-id") String customerId,
+            @PathVariable("restaurant-id") String restaurantId) {
+        customerService.addRestaurantToFavourites(customerId, restaurantId, restaurantRequest);
+        return ResponseEntity.noContent().build();
+
+
+     */
+
+    /*
     // remove a restaurant from a customers favourite list
     @DeleteMapping("/{customer-id}/favourite-restaurant/{restaurant-id}")
     public ResponseEntity<Void> removeRestaurantFromCustomerFavourites(@PathVariable("customer-id") String customerId,
@@ -83,10 +101,14 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
+     */
+
+    /*
     // Retrieve a customer's favorite restaurants
     @GetMapping("/{customer-id}/favourite-restaurants")
     public ResponseEntity<List<RestaurantResponse>> retrieveFavouriteRestaurants(
             @PathVariable("customer-id") String customerId) {
         return ResponseEntity.ok(customerService.retrieveFavouriteRestaurants(customerId));
     }
+     */
 }

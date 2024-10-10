@@ -6,14 +6,16 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Builder
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Validated
 public class FavouriteRestaurants {
-
     private Integer restaurantId;
-    private LocalDateTime addedAt;
+    private String name;
+    private LocalDateTime createdAt;
+
 }

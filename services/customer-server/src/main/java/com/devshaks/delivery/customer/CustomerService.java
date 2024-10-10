@@ -1,8 +1,12 @@
 package com.devshaks.delivery.customer;
 
+import com.devshaks.delivery.customer.exceptions.BusinessException;
 import com.devshaks.delivery.customer.exceptions.CustomerNotFoundException;
+import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
 import com.devshaks.delivery.customer.handlers.UnauthorizedException;
-import com.devshaks.delivery.restaurants.RestaurantResponse;
+import com.devshaks.delivery.customer.restaurants.RestaurantClient;
+import com.devshaks.delivery.customer.restaurants.RestaurantRequest;
+import com.devshaks.delivery.customer.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,7 @@ import java.util.List;
 public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final RestaurantClient restaurantClient;
 
     // Method to create a new customer
     public String createCustomer(@Valid CustomerRequest customerRequest) {
@@ -105,14 +110,49 @@ public class CustomerService {
 
     // TODO: Implement the following methods
 
-    public void addRestaurantToFavourites(String customerId, String restaurantId) {
-
+    /*
+    public void addRestaurantToFavourites(String customerId, String restaurantId, RestaurantRequest restaurantRequest) {
+        var customer = this.customerRepository.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+        var addToFavourites = this.restaurantClient.getRestaurantsById(restaurantRequest.restaurantId());
     }
+     */
 
-    public void removeRestaurantFromCustomerFavourites(String customerId, String restaurantId) {
+
+    /**
+     * Adds a restaurant to the customer's favorite list.
+     *
+     * @param customerId        The ID of the customer.
+     * @param restaurantId      The ID of the restaurant to add to favorites.
+     * @param restaurantRequest The restaurant details from the request body.
+     */
+    public void addRestaurantToFavourites(String customerId, String restaurantId, RestaurantRequest restaurantRequest) {
+        // Fetch the customer by ID, throw an exception if not found
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+
+        // Fetch the restaurant details from the Restaurant Microservice
+        RestaurantResponse restaurantResponse = restaurantClient.getRestaurantsById(restaurantRequest.restaurantId());
+
+        // Check if the Restaurant is already in customers favourite list
+        boolean isAlreadyFavourited = customer.getFavouriteRestaurants()
+                .stream()
+                .anyMatch(favouriteRestaurants -> favouriteRestaurants.getRestaurantId().equals(restaurantId));
+
+        if (isAlreadyFavourited) {
+            throw new BusinessException("Restaurant already in favourites");
+        }
+
+        // add the restaurant to the customers favourite list
+        FavouriteRestaurants favouriteRestaurant = new FavouriteRestaurants(restaurantResponse.restaurantId(), restaurantResponse.name(), restaurantResponse.createdAt());
+        customer.getFavouriteRestaurants().add(favouriteRestaurant);
+
+        // Save the updated customer entity back to the repository
+        customerRepository.save(customer);
     }
 
     public List<RestaurantResponse> retrieveFavouriteRestaurants(String customerId) {
         return null;
     }
+
+
 }
