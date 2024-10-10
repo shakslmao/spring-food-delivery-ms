@@ -87,4 +87,9 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.findAllRestaurants());
 
     }
+
+    @PostMapping("/by-ids")
+    public ResponseEntity<List<RestaurantFavouriteResponse>> findRestaurantByIds(@RequestBody List<Integer> restaurantIds) {
+        return ResponseEntity.ok(restaurantService.findRestaurantByIds(restaurantIds));
+    }
 }

@@ -52,4 +52,11 @@ public class RestaurantMapper {
                 restaurant.getDescription(),
                 cuisineTypes);
     }
+
+    public RestaurantFavouriteResponse toFavouriteRestaurantResponse(Restaurant restaurant) {
+        return new RestaurantFavouriteResponse(
+                restaurant.getId(),
+                restaurant.getName()
+        );
+    }
 }

@@ -127,4 +127,11 @@ public class RestaurantService {
                 .collect(Collectors.toList());
 
     }
+
+    public List<RestaurantFavouriteResponse> findRestaurantByIds(List<Integer> restaurantIds) {
+        List<Restaurant> restaurants = restaurantRepository.findAllById(restaurantIds);
+        return restaurants.stream()
+                .map(restaurantMapper::toFavouriteRestaurantResponse)
+                .collect(Collectors.toList());
+    }
 }

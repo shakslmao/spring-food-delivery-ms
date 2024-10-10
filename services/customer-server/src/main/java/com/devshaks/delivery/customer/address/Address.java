@@ -1,4 +1,4 @@
-package com.devshaks.delivery.customer;
+package com.devshaks.delivery.customer.address;
 
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
