@@ -1,4 +1,6 @@
 package com.devshaks.delivery.restaurants;
 
-public record RestaurantResponse() {
+public record RestaurantResponse(
+        Integer restaurantId,
+        String name) {
 }
