@@ -2,6 +2,7 @@ package com.devshaks.delivery.customer.restaurants;
 
 import com.devshaks.delivery.customer.exceptions.BusinessException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -10,11 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RestaurantClient {
 
     @Value("${application.config.restaurants-url}")
@@ -31,13 +35,19 @@ public class RestaurantClient {
      */
     public RestaurantResponse getRestaurantsById(Integer restaurantId) {
         try {
+            // Builds the URL for the restaurant service's /restaurants/{id} endpoint with the restaurant ID.
+            String url = UriComponentsBuilder.fromHttpUrl(restaurantsUrl)
+                    .path("/restaurants/{restaurantId}")
+                    .buildAndExpand(restaurantId)
+                    .toUriString();
             // Sends a GET request to the restaurant service's /restaurants/{id} endpoint and expects a RestaurantResponse.
-            ResponseEntity<RestaurantResponse> response = restTemplate.getForEntity(
-                    restaurantsUrl + "/restaurants/" + restaurantId, RestaurantResponse.class
-            );
-            // Returns the body of the response, which contains the restaurant details.
-            return response.getBody();
+            ResponseEntity<RestaurantResponse> response = restTemplate.getForEntity(url, RestaurantResponse.class);
+
+            // returns the body of the response, which contains the restaurant details.
+            return Optional.ofNullable(response.getBody())
+                    .orElseThrow(() -> new BusinessException("Restaurant not found: " + restaurantId));
         } catch (HttpClientErrorException exception) {
+            log.error("Error fetching restaurant details: {}", exception.getMessage());
             // Handles the case where the restaurant service returns a 4xx error, typically a 404 (not found).
             throw new BusinessException("Restaurant not found: " + restaurantId);
         }
@@ -50,8 +60,12 @@ public class RestaurantClient {
      * @return A list of RestaurantResponse objects containing details of the restaurants.
      * @throws BusinessException If any restaurant is not found (404 error), a BusinessException is thrown.
      */
-    public List<RestaurantResponse> getRestaurants(List<Integer> restaurantIds) {
+    public List<RestaurantResponse> getRestaurantsByIds(List<Integer> restaurantIds) {
         try {
+            String url = UriComponentsBuilder.fromHttpUrl(restaurantsUrl)
+                    .path("/restaurants/search/by-ids")
+                    .toUriString();
+
             // Creates an HTTP request entity that includes the list of restaurant IDs to be sent in the request body.
             HttpEntity<List<Integer>> requestEntity = new HttpEntity<>(restaurantIds);
 
@@ -61,15 +75,16 @@ public class RestaurantClient {
             // Sends a POST request to the restaurant service's /restaurants/by-ids endpoint with the list of IDs.
             // The exchange method allows specifying the request method (POST) and response type (List<RestaurantResponse>).
             ResponseEntity<List<RestaurantResponse>> response = restTemplate.exchange(
-                    restaurantsUrl + "/restaurants/search/by-ids",
+                    url,
                     HttpMethod.POST,
                     requestEntity,
-                    responseType
-            );
+                    responseType);
 
             // Returns the body of the response, which contains the list of restaurant details.
-            return response.getBody();
+            return Optional.ofNullable(response.getBody())
+                    .orElseThrow(() -> new BusinessException("Restaurant not found: " + restaurantIds));
         } catch (HttpClientErrorException exception) {
+            log.error("Error fetching restaurant details: {}", restaurantIds, exception);
             // Handles the case where the restaurant service returns a 4xx error, typically a 404 (not found).
             throw new BusinessException("Restaurant not found: " + restaurantIds);
         }

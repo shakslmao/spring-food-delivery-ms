@@ -75,22 +75,10 @@ public class CustomerController {
             @RequestBody @Valid RestaurantRequest restaurantRequest
     ){
         customerService.addRestaurantToFavourites(customerId, restaurantId, restaurantRequest);
-        URI location = URI.create("/api/v1/customers/ + customerId + /favourite-restaurant/" + restaurantId);
+        URI location = URI.create("/api/v1/customers/" + customerId + "/favourite-restaurant/" + restaurantId);
         return ResponseEntity.created(location).build();
     }
 
-
-    /*
-    @PostMapping("/{customer-id}/favorite-restaurant/{restaurant-id}")
-    public ResponseEntity<Void> addRestaurantToFavourites(
-            @RequestBody @Valid RestaurantRequest restaurantRequest,
-            @PathVariable("customer-id") String customerId,
-            @PathVariable("restaurant-id") String restaurantId) {
-        customerService.addRestaurantToFavourites(customerId, restaurantId, restaurantRequest);
-        return ResponseEntity.noContent().build();
-
-
-     */
 
     /*
     // remove a restaurant from a customers favourite list

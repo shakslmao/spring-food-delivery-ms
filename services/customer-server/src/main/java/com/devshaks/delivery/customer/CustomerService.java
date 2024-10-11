@@ -2,6 +2,7 @@ package com.devshaks.delivery.customer;
 
 import com.devshaks.delivery.customer.exceptions.BusinessException;
 import com.devshaks.delivery.customer.exceptions.CustomerNotFoundException;
+import com.devshaks.delivery.customer.exceptions.RestaurantNotFoundException;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
 import com.devshaks.delivery.customer.handlers.UnauthorizedException;
 import com.devshaks.delivery.customer.restaurants.RestaurantClient;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
@@ -109,15 +111,6 @@ public class CustomerService {
     }
 
     // TODO: Implement the following methods
-
-    /*
-    public void addRestaurantToFavourites(String customerId, String restaurantId, RestaurantRequest restaurantRequest) {
-        var customer = this.customerRepository.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
-        var addToFavourites = this.restaurantClient.getRestaurantsById(restaurantRequest.restaurantId());
-    }
-     */
-
-
     /**
      * Adds a restaurant to the customer's favorite list.
      *
@@ -125,6 +118,7 @@ public class CustomerService {
      * @param restaurantId      The ID of the restaurant to add to favorites.
      * @param restaurantRequest The restaurant details from the request body.
      */
+    @Transactional
     public void addRestaurantToFavourites(String customerId, String restaurantId, RestaurantRequest restaurantRequest) {
         // Fetch the customer by ID, throw an exception if not found
         Customer customer = customerRepository.findById(customerId)
@@ -132,6 +126,9 @@ public class CustomerService {
 
         // Fetch the restaurant details from the Restaurant Microservice
         RestaurantResponse restaurantResponse = restaurantClient.getRestaurantsById(restaurantRequest.restaurantId());
+        if (restaurantResponse == null) {
+            throw new RestaurantNotFoundException("Restaurant with ID: " + restaurantRequest.restaurantId() + " not found");
+        }
 
         // Check if the Restaurant is already in customers favourite list
         boolean isAlreadyFavourited = customer.getFavouriteRestaurants()
@@ -143,7 +140,10 @@ public class CustomerService {
         }
 
         // add the restaurant to the customers favourite list
-        FavouriteRestaurants favouriteRestaurant = new FavouriteRestaurants(restaurantResponse.restaurantId(), restaurantResponse.name(), restaurantResponse.createdAt());
+        FavouriteRestaurants favouriteRestaurant = new FavouriteRestaurants(
+                restaurantResponse.restaurantId(),
+                restaurantResponse.name(),
+                restaurantResponse.createdAt());
         customer.getFavouriteRestaurants().add(favouriteRestaurant);
 
         // Save the updated customer entity back to the repository
