@@ -61,6 +61,9 @@ public class RestaurantClient {
      * @throws BusinessException If any restaurant is not found (404 error), a BusinessException is thrown.
      */
     public List<RestaurantResponse> getRestaurantsByIds(List<Integer> restaurantIds) {
+        if (restaurantIds == null || restaurantIds.isEmpty()) {
+            throw new IllegalArgumentException("Restaurant IDs cannot be null or empty");
+        }
         try {
             String url = UriComponentsBuilder.fromHttpUrl(restaurantsUrl)
                     .path("/restaurants/search/by-ids")
@@ -68,7 +71,6 @@ public class RestaurantClient {
 
             // Creates an HTTP request entity that includes the list of restaurant IDs to be sent in the request body.
             HttpEntity<List<Integer>> requestEntity = new HttpEntity<>(restaurantIds);
-
             // Defines a type reference for the expected response body, which is a list of RestaurantResponse objects.
             ParameterizedTypeReference<List<RestaurantResponse>> responseType = new ParameterizedTypeReference<>() {};
 

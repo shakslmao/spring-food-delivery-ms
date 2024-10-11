@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -150,9 +152,57 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-    public List<RestaurantResponse> retrieveFavouriteRestaurants(String customerId) {
-        return null;
+
+    /**
+     * Removes a restaurant from the customer's favorite list.
+     *
+     * @param customerId   The ID of the customer.
+     * @param restaurantId The ID of the restaurant to remove from favorites.
+     */
+    @Transactional
+    public void removeRestaurantFromCustomerFavourites(String customerId, String restaurantId) {
+        // validate input params
+        if (customerId == null || restaurantId == null) {
+            throw new BusinessException("Customer ID and Restaurant ID must be provided");
+        }
+
+        // Fetch the customer by ID, throw an exception if not found
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+
+        // Check if the Restaurant is in customers favourite list
+        boolean removed = customer.getFavouriteRestaurants().removeIf(
+                favouriteRestaurant -> favouriteRestaurant.getRestaurantId().equals(restaurantId)
+        );
+
+        if (!removed) {
+            throw new BusinessException("Restaurant not found in favourites");
+        }
+
+        // Save the updated customer entity back to the repository
+        customerRepository.save(customer);
     }
 
 
+    /**
+     * Retrieves a customer's favorite restaurants.
+     *
+     * @param customerId The ID of the customer.
+     * @return A list of RestaurantResponse objects containing the details of the favorite restaurants.
+     */
+    public List<RestaurantResponse> retrieveFavouriteRestaurants(String customerId) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+
+        List<Integer> favouriteRestaurants = customer.getFavouriteRestaurants()
+                .stream()
+                .map(favourite -> Integer.parseInt(String.valueOf(favourite.getRestaurantId())))
+                .collect(Collectors.toList());
+
+        if (favouriteRestaurants.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return restaurantClient.getRestaurantsByIds(favouriteRestaurants);
+    }
 }

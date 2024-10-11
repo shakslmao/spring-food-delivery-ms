@@ -1,6 +1,7 @@
 package com.devshaks.delivery.customer;
 
 import com.devshaks.delivery.customer.restaurants.RestaurantRequest;
+import com.devshaks.delivery.customer.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,6 @@ public class CustomerController {
     }
 
 
-    /*
     // remove a restaurant from a customers favourite list
     @DeleteMapping("/{customer-id}/favourite-restaurant/{restaurant-id}")
     public ResponseEntity<Void> removeRestaurantFromCustomerFavourites(@PathVariable("customer-id") String customerId,
@@ -89,14 +89,12 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
-     */
 
-    /*
     // Retrieve a customer's favorite restaurants
     @GetMapping("/{customer-id}/favourite-restaurants")
     public ResponseEntity<List<RestaurantResponse>> retrieveFavouriteRestaurants(
             @PathVariable("customer-id") String customerId) {
         return ResponseEntity.ok(customerService.retrieveFavouriteRestaurants(customerId));
     }
-     */
+
 }
