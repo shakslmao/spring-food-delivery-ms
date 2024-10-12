@@ -1,5 +1,7 @@
 package com.devshaks.delivery.restaurant;
 
+import com.devshaks.delivery.cuisine.CuisineTypes;
+import com.devshaks.delivery.cuisine.CuisineTypesResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -88,9 +90,37 @@ public class RestaurantController {
 
     }
 
+    /**
+     * Endpoint to search for restaurants by their IDs.
+     *
+     * @param restaurantIds
+     *            A list of restaurant IDs to search for.
+     * @return A ResponseEntity containing a list of RestaurantFavouriteResponse
+     *         objects and a 200 OK status.
+     */
     @PostMapping("/search/by-ids")
     public ResponseEntity<List<RestaurantFavouriteResponse>> findRestaurantByIds(
             @RequestBody List<Integer> restaurantIds) {
         return ResponseEntity.ok(restaurantService.findRestaurantByIds(restaurantIds));
+    }
+
+
+    /**
+     * Endpoint to add a new cuisine to a restaurant.
+     *
+     * @param restaurantId
+     *            The ID of the restaurant to add the cuisine to.
+     * @param cuisine
+     *            A valid CuisineTypesResponse object containing the details of the
+     *            cuisine to be added.
+     * @return A ResponseEntity containing the newly created CuisineTypes object and
+     *         a 200 OK status.
+     */
+    @PostMapping("/restaurants/{restaurantId}/cuisine")
+    public ResponseEntity<CuisineTypes> addCuisineToRestaurant(@PathVariable("restaurantId") Integer restaurantId, @RequestBody CuisineTypesResponse cuisine) {
+        // Calls the service to add a new cuisine to the restaurant
+        CuisineTypes newCuisine = restaurantService.addCuisineToRestaurant(restaurantId, cuisine);
+        // Returns a response with the newly created cuisine and a 201 CREATED status
+        return ResponseEntity.ok(newCuisine);
     }
 }

@@ -2,18 +2,22 @@ package com.devshaks.delivery.restaurant;
 
 import com.devshaks.delivery.cuisine.CuisineTypes;
 import com.devshaks.delivery.cuisine.CuisineTypesRepository;
+import com.devshaks.delivery.cuisine.CuisineTypesResponse;
 import com.devshaks.delivery.exceptions.CuisineNotFoundException;
+import com.devshaks.delivery.exceptions.RestaurantNotFoundException;
 import com.devshaks.delivery.exceptions.RestaurantPurchaseException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class RestaurantService {
 
     // Injects required dependencies for restaurant mapping, repository access, and
@@ -33,9 +37,13 @@ public class RestaurantService {
         if (restaurantRequest.cuisineTypes() == null || restaurantRequest.cuisineTypes().isEmpty()) {
             throw new IllegalArgumentException("At least one cuisine type is required");
         }
-        // Maps the request data to a Restaurant entity and saves it to the repository
-        var restaurant = restaurantMapper.mapRestaurantToRequest(restaurantRequest);
-        return restaurantRepository.save(restaurant).getId(); // Returns the generated ID
+
+        Restaurant restaurant = restaurantMapper.mapRestaurantToRequest(restaurantRequest);
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+
+        // Saves the cuisine types to the repository
+        cuisineTypesRepository.saveAll(restaurant.getCuisineTypes());
+        return savedRestaurant.getId();
     }
 
     /**
@@ -131,10 +139,45 @@ public class RestaurantService {
 
     }
 
+
+    /**
+     * Searches for restaurants by their IDs.
+     *
+     * @param restaurantIds
+     *            A list of restaurant IDs to search for.
+     * @return A list of RestaurantFavouriteResponse objects containing the details of
+     *         the found restaurants.
+     */
     public List<RestaurantFavouriteResponse> findRestaurantByIds(List<Integer> restaurantIds) {
         List<Restaurant> restaurants = restaurantRepository.findAllById(restaurantIds);
         return restaurants.stream()
                 .map(restaurantMapper::toFavouriteRestaurantResponse)
                 .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Adds a new cuisine to a restaurant.
+     *
+     * @param restaurantId
+     *            The ID of the restaurant to add the cuisine to.
+     * @param cuisine
+     *            The details of the cuisine to add.
+     * @return The newly created CuisineTypes object.
+     * @throws RestaurantNotFoundException
+     *             if the specified restaurant is not found.
+     */
+    public CuisineTypes addCuisineToRestaurant(Integer restaurantId, CuisineTypesResponse cuisine) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found"));
+
+        CuisineTypes newCuisine = CuisineTypes.builder()
+                .name(cuisine.name())
+                .description(cuisine.description())
+                .price(cuisine.price())
+                .restaurant(restaurant)
+                .build();
+
+        return cuisineTypesRepository.save(newCuisine);
     }
 }

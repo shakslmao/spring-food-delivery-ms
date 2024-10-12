@@ -47,7 +47,6 @@ public class Restaurant {
     private String priceRange;
 
     // One-to-many relationship with CuisineTypes
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Column(nullable = false)
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<CuisineTypes> cuisineTypes = new ArrayList<>();
 }

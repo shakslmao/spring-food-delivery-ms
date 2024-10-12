@@ -25,7 +25,7 @@ public class CuisineTypes {
     @Column(nullable = false, columnDefinition = "NUMERIC")
     private Double price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 }
