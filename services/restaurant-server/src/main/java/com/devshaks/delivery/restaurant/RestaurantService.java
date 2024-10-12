@@ -30,6 +30,9 @@ public class RestaurantService {
      * @return The unique identifier (ID) of the newly created restaurant.
      */
     public Integer createRestaurant(@Valid RestaurantRequest restaurantRequest) {
+        if (restaurantRequest.cuisineTypes() == null || restaurantRequest.cuisineTypes().isEmpty()) {
+            throw new IllegalArgumentException("At least one cuisine type is required");
+        }
         // Maps the request data to a Restaurant entity and saves it to the repository
         var restaurant = restaurantMapper.mapRestaurantToRequest(restaurantRequest);
         return restaurantRepository.save(restaurant).getId(); // Returns the generated ID

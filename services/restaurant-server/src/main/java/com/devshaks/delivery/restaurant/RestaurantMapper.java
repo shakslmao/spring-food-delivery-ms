@@ -1,5 +1,6 @@
 package com.devshaks.delivery.restaurant;
 
+import com.devshaks.delivery.cuisine.CuisineRequest;
 import com.devshaks.delivery.cuisine.CuisineTypes;
 import com.devshaks.delivery.cuisine.CuisineTypesRepository;
 import jakarta.validation.Valid;
@@ -7,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -14,7 +16,6 @@ public class RestaurantMapper {
     private final CuisineTypesRepository cuisineTypesRepository;
 
     public Restaurant mapRestaurantToRequest(@Valid RestaurantRequest restaurantRequest) {
-        List<CuisineTypes> cuisineTypes = cuisineTypesRepository.findAllById(restaurantRequest.cuisineTypesId());
         return Restaurant.builder()
                 .id(restaurantRequest.id())
                 .name(restaurantRequest.name())
@@ -26,9 +27,21 @@ public class RestaurantMapper {
                 .rating(restaurantRequest.rating())
                 .isOpen(restaurantRequest.isOpen())
                 .priceRange(restaurantRequest.priceRange())
-                .cuisineTypes(cuisineTypes)
+                .cuisineTypes(mapCuisineTypes(restaurantRequest.cuisineTypes()))
                 .build();
     }
+
+    private List<CuisineTypes> mapCuisineTypes(List<CuisineRequest> cuisineRequests) {
+        return cuisineRequests.stream()
+                .map(cuisineRequest -> CuisineTypes.builder()
+                        .id(cuisineRequest.id())
+                        .name(cuisineRequest.name())
+                        .description(cuisineRequest.description())
+                        .price(cuisineRequest.price())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 
     public RestaurantResponse toRestaurantResponse(Restaurant restaurant) {
         return new RestaurantResponse(

@@ -67,7 +67,6 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
-    // TODO: Implement the following endpoints
     // Add a Restaurant to a customer's favourite list
     @PostMapping("/{customer-id}/favorite-restaurant/{restaurant-id}")
     public ResponseEntity<Void> addRestaurantToFavourites(

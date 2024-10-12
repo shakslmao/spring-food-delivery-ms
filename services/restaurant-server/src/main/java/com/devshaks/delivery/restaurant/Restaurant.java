@@ -48,5 +48,6 @@ public class Restaurant {
 
     // One-to-many relationship with CuisineTypes
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Column(nullable = false)
     private List<CuisineTypes> cuisineTypes = new ArrayList<>();
 }
