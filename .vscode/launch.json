@@ -18,7 +18,8 @@
             "mainClass": "com.devshaks.configuration_server.ConfigurationServerApplication",
             "projectName": "configuration-server",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=54435 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=configuration-server"
         },
         {
             "type": "java",
@@ -28,7 +29,8 @@
             "mainClass": "com.devshaks.discovery_server.DiscoveryServerApplication",
             "projectName": "discovery-server",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=54457 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=discovery-server"
         },
         {
             "type": "java",
@@ -37,6 +39,17 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.devshaks.delivery.ApigatewayApplication",
             "projectName": "apigateway",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=54474 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=apigateway"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-RestaurantServerApplication<restaurant-server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.devshaks.delivery.RestaurantServerApplication",
+            "projectName": "restaurant-server",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

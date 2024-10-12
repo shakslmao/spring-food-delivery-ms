@@ -30,7 +30,7 @@ public class CustomerService {
     private final RestaurantClient restaurantClient;
 
     // Method to create a new customer
-    public String createCustomer(@Valid CustomerRequest customerRequest) {
+    public Integer createCustomer(@Valid CustomerRequest customerRequest) {
         try {
             // Map the incoming customer request to a customer entity and save it to the repository
             var customer = customerRepository.save(customerMapper.mapCustomerToRequest(customerRequest));
@@ -49,7 +49,7 @@ public class CustomerService {
     }
 
     // Method to update an existing customer
-    public void updateCustomer(String customerId, @Valid CustomerRequest customerRequest) {
+    public void updateCustomer(Integer customerId, @Valid CustomerRequest customerRequest) {
         // Find the customer by ID, throw an exception if not found
         var customer = customerRepository.findById(customerRequest.id())
                 .orElseThrow(() -> new CustomerNotFoundException("Customer With Id: " + customerRequest.id() + " Not Found"));
@@ -101,13 +101,13 @@ public class CustomerService {
     }
 
     // Method to check if a customer exists by their ID
-    public Boolean existingCustomerById(String customerId) {
+    public Boolean existingCustomerById(Integer customerId) {
         // Return true if the customer exists, false otherwise
         return customerRepository.findById(customerId).isPresent();
     }
 
     // Method to delete a customer by their ID
-    public void deleteCustomerById(String customerId) {
+    public void deleteCustomerById(Integer customerId) {
         // Delete the customer by ID
         customerRepository.deleteById(customerId);
     }
@@ -121,7 +121,7 @@ public class CustomerService {
      * @param restaurantRequest The restaurant details from the request body.
      */
     @Transactional
-    public void addRestaurantToFavourites(String customerId, String restaurantId, RestaurantRequest restaurantRequest) {
+    public void addRestaurantToFavourites(Integer customerId, String restaurantId, RestaurantRequest restaurantRequest) {
         // Fetch the customer by ID, throw an exception if not found
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
@@ -135,7 +135,7 @@ public class CustomerService {
         // Check if the Restaurant is already in customers favourite list
         boolean isAlreadyFavourited = customer.getFavouriteRestaurants()
                 .stream()
-                .anyMatch(favouriteRestaurants -> favouriteRestaurants.getRestaurantId().equals(restaurantId));
+                .anyMatch(favouriteRestaurants -> favouriteRestaurants.getId().equals(restaurantId));
 
         if (isAlreadyFavourited) {
             throw new BusinessException("Restaurant already in favourites");
@@ -143,7 +143,7 @@ public class CustomerService {
 
         // add the restaurant to the customers favourite list
         FavouriteRestaurants favouriteRestaurant = new FavouriteRestaurants(
-                restaurantResponse.restaurantId(),
+                restaurantResponse.id(),
                 restaurantResponse.name(),
                 restaurantResponse.createdAt());
         customer.getFavouriteRestaurants().add(favouriteRestaurant);
@@ -152,7 +152,6 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-
     /**
      * Removes a restaurant from the customer's favorite list.
      *
@@ -160,7 +159,7 @@ public class CustomerService {
      * @param restaurantId The ID of the restaurant to remove from favorites.
      */
     @Transactional
-    public void removeRestaurantFromCustomerFavourites(String customerId, String restaurantId) {
+    public void removeRestaurantFromCustomerFavourites(Integer customerId, String restaurantId) {
         // validate input params
         if (customerId == null || restaurantId == null) {
             throw new BusinessException("Customer ID and Restaurant ID must be provided");
@@ -172,7 +171,7 @@ public class CustomerService {
 
         // Check if the Restaurant is in customers favourite list
         boolean removed = customer.getFavouriteRestaurants().removeIf(
-                favouriteRestaurant -> favouriteRestaurant.getRestaurantId().equals(restaurantId)
+                favouriteRestaurant -> favouriteRestaurant.getId().equals(restaurantId)
         );
 
         if (!removed) {
@@ -183,20 +182,19 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-
     /**
      * Retrieves a customer's favorite restaurants.
      *
      * @param customerId The ID of the customer.
      * @return A list of RestaurantResponse objects containing the details of the favorite restaurants.
      */
-    public List<RestaurantResponse> retrieveFavouriteRestaurants(String customerId) {
+    public List<RestaurantResponse> retrieveFavouriteRestaurants(Integer customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
 
         List<Integer> favouriteRestaurants = customer.getFavouriteRestaurants()
                 .stream()
-                .map(favourite -> Integer.parseInt(String.valueOf(favourite.getRestaurantId())))
+                .map(FavouriteRestaurants::getId)
                 .collect(Collectors.toList());
 
         if (favouriteRestaurants.isEmpty()) {

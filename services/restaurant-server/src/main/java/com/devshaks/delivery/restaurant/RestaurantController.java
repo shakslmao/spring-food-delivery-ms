@@ -89,7 +89,8 @@ public class RestaurantController {
     }
 
     @PostMapping("/search/by-ids")
-    public ResponseEntity<List<RestaurantFavouriteResponse>> findRestaurantByIds(@RequestBody List<Integer> restaurantIds) {
+    public ResponseEntity<List<RestaurantFavouriteResponse>> findRestaurantByIds(
+            @RequestBody List<Integer> restaurantIds) {
         return ResponseEntity.ok(restaurantService.findRestaurantByIds(restaurantIds));
     }
 }

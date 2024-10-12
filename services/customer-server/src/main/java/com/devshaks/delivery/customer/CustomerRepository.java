@@ -1,6 +1,6 @@
 package com.devshaks.delivery.customer;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CustomerRepository extends MongoRepository<Customer, String> {
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 }

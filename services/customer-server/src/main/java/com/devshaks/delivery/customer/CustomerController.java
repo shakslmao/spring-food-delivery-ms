@@ -25,7 +25,7 @@ public class CustomerController {
     public ResponseEntity<Void> createCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
         // Call the customer service to create the customer and return the customer's ID
         // in the response
-        String customerId = customerService.createCustomer(customerRequest);
+        Integer customerId = customerService.createCustomer(customerRequest);
         URI location = URI.create("/api/v1/customers/" + customerId);
         return ResponseEntity.created(location).build();
     }
@@ -33,7 +33,7 @@ public class CustomerController {
     // Endpoint to update an existing customer
     // Update an existing customer and return 204 No Content
     @PutMapping("/{customer-id}")
-    public ResponseEntity<Void> updateCustomer(@PathVariable("customer-id") String customerId,
+    public ResponseEntity<Void> updateCustomer(@PathVariable("customer-id") Integer customerId,
             @RequestBody @Valid CustomerRequest customerRequest) {
         // Call the customer service to update the customer
         customerService.updateCustomer(customerId, customerRequest);
@@ -51,7 +51,7 @@ public class CustomerController {
 
     // Endpoint to check if a customer exists by ID
     @GetMapping("/{customer-id}")
-    public ResponseEntity<Boolean> existingCustomerById(@PathVariable("customer-id") String customerId) {
+    public ResponseEntity<Boolean> existingCustomerById(@PathVariable("customer-id") Integer customerId) {
         // Call the customer service to check if the customer exists and return the
         // result in the response
         if (customerService.existingCustomerById(customerId)) {
@@ -62,7 +62,7 @@ public class CustomerController {
 
     // Endpoint to delete a customer by their ID
     @DeleteMapping("/{customer-id}")
-    public ResponseEntity<Void> deleteCustomerById(@PathVariable("customer-id") String customerId) {
+    public ResponseEntity<Void> deleteCustomerById(@PathVariable("customer-id") Integer customerId) {
         customerService.deleteCustomerById(customerId);
         return ResponseEntity.noContent().build();
     }
@@ -71,29 +71,26 @@ public class CustomerController {
     // Add a Restaurant to a customer's favourite list
     @PostMapping("/{customer-id}/favorite-restaurant/{restaurant-id}")
     public ResponseEntity<Void> addRestaurantToFavourites(
-            @PathVariable("customer-id") String customerId,
+            @PathVariable("customer-id") Integer customerId,
             @PathVariable("restaurant-id") String restaurantId,
-            @RequestBody @Valid RestaurantRequest restaurantRequest
-    ){
+            @RequestBody @Valid RestaurantRequest restaurantRequest) {
         customerService.addRestaurantToFavourites(customerId, restaurantId, restaurantRequest);
         URI location = URI.create("/api/v1/customers/" + customerId + "/favourite-restaurant/" + restaurantId);
         return ResponseEntity.created(location).build();
     }
 
-
     // remove a restaurant from a customers favourite list
     @DeleteMapping("/{customer-id}/favourite-restaurant/{restaurant-id}")
-    public ResponseEntity<Void> removeRestaurantFromCustomerFavourites(@PathVariable("customer-id") String customerId,
+    public ResponseEntity<Void> removeRestaurantFromCustomerFavourites(@PathVariable("customer-id") Integer customerId,
             @PathVariable("restaurant-id") String restaurantId) {
         customerService.removeRestaurantFromCustomerFavourites(customerId, restaurantId);
         return ResponseEntity.noContent().build();
     }
 
-
     // Retrieve a customer's favorite restaurants
     @GetMapping("/{customer-id}/favourite-restaurants")
     public ResponseEntity<List<RestaurantResponse>> retrieveFavouriteRestaurants(
-            @PathVariable("customer-id") String customerId) {
+            @PathVariable("customer-id") Integer customerId) {
         return ResponseEntity.ok(customerService.retrieveFavouriteRestaurants(customerId));
     }
 

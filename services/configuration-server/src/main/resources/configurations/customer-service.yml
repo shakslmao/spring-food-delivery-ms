@@ -1,11 +1,18 @@
+spring:
+    datasource:
+        url: jdbc:postgresql://localhost:5432/customerdb
+        username: root
+        password: root
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        database: postgresql
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 server:
     port: 8090
-spring:
-    data:
-        mongodb:
-            username: root
-            password: root
-            host: localhost
-            port: 27017
-            database: customer
-            authentication-database: admin
+
+application:
+    config:
+        restaurants-url: http://localhost:8222/restaurants

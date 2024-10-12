@@ -3,8 +3,7 @@ package com.devshaks.delivery.customer.restaurants;
 import java.time.LocalDateTime;
 
 public record RestaurantResponse(
-        Integer restaurantId,
+        Integer id,
         String name,
-        LocalDateTime createdAt
-        ) {
+        LocalDateTime createdAt) {
 }

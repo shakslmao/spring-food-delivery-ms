@@ -56,7 +56,6 @@ public class RestaurantMapper {
     public RestaurantFavouriteResponse toFavouriteRestaurantResponse(Restaurant restaurant) {
         return new RestaurantFavouriteResponse(
                 restaurant.getId(),
-                restaurant.getName()
-        );
+                restaurant.getName());
     }
 }

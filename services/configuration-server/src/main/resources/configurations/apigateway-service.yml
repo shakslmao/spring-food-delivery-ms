@@ -13,9 +13,13 @@ spring:
                     enabled: true
             routes:
                 - id: customer-service
-                  uri: lb://CUSTOMER-SERVICE
+                  uri: lb:http://CUSTOMER-SERVICE
                   predicates:
                       - Path=/api/v1/customers/**
+                - id: restaurant-service
+                  uri: lb:http://RESTAURANT-SERVICE
+                  predicates:
+                      - Path=/api/v1/restaurants/**
 logging:
     level:
         org.springframework.security.oauth2.server.resource: DEBUG

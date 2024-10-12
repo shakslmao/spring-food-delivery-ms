@@ -35,7 +35,7 @@ public class Restaurant {
     private String description;
 
     @Column(nullable = false)
-    private String openingHours;  // Time format: e.g., "09:00 - 21:00"
+    private String openingHours; // Time format: e.g., "09:00 - 21:00"
 
     @Column(nullable = false)
     private Double rating;

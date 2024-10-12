@@ -21,7 +21,8 @@ public class CustomerMapper {
     }
 
     public CustomerResponse mapCustomerToResponse(Customer customer) {
-        if (customer == null) return null;
+        if (customer == null)
+            return null;
 
         return new CustomerResponse(
                 customer.getId(),
@@ -30,7 +31,6 @@ public class CustomerMapper {
                 customer.getLastName(),
                 customer.getEmail(),
                 customer.getPhoneNumber(),
-                customer.getAddress()
-        );
+                customer.getAddress());
     }
 }
