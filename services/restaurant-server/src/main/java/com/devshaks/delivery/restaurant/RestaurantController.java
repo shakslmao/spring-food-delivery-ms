@@ -4,6 +4,7 @@ import com.devshaks.delivery.cuisine.CuisineTypes;
 import com.devshaks.delivery.cuisine.CuisineTypesResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,10 +54,31 @@ public class RestaurantController {
     }
 
 
+    /**
+     * Endpoint to delete a restaurant by its ID.
+     * @param restaurantId The ID of the restaurant to delete.
+     * @return A ResponseEntity with a 204 NO CONTENT status.
+     */
+    @DeleteMapping("/delete/{restaurantId}")
+    public ResponseEntity<Void> deleteRestaurant(@PathVariable("restaurantId") Integer restaurantId) {
+        restaurantService.deleteRestaurant(restaurantId);
+        return ResponseEntity.noContent().build();
+    }
 
-    // Delete Restaurant
-
-    // Delete Cuisine from Restaurant
+    /**
+     * Endpoint to delete a cuisine from a restaurant.
+     * @param restaurantId The ID of the restaurant to delete the cuisine from.
+     * @param cuisineId The ID of the cuisine to delete.
+     * @return A ResponseEntity with a 204 NO CONTENT status.
+     */
+    @DeleteMapping("/delete/{restaurantId}/cuisine/{cuisineId}")
+    public ResponseEntity<Void> deleteCuisineFromRestaurant(
+            @PathVariable("restaurantId") Integer restaurantId,
+            @PathVariable("cuisineId") Integer cuisineId
+    ) {
+        restaurantService.deleteCuisineFromRestaurant(restaurantId, cuisineId);
+        return ResponseEntity.noContent().build();
+    }
 
     // Update Restaurant
 

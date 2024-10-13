@@ -46,6 +46,7 @@ public class RestaurantService {
         return savedRestaurant.getId();
     }
 
+
     /**
      * Handles the purchase of cuisines from a specific restaurant.
      *
@@ -112,6 +113,7 @@ public class RestaurantService {
                 .collect(Collectors.toList());
     }
 
+
     /**
      * Finds a restaurant by its ID.
      *
@@ -126,6 +128,7 @@ public class RestaurantService {
                 .map(restaurantMapper::toRestaurantResponse)
                 .orElseThrow(() -> new EntityNotFoundException("Restaurant not found"));
     }
+
 
     /**
      * Fetches all restaurants in the system.
@@ -195,4 +198,31 @@ public class RestaurantService {
     }
 
 
+    /**
+     * Deletes a restaurant by its ID.
+     * @param restaurantId The ID of the restaurant to delete.
+     * @throws RestaurantNotFoundException if the restaurant is not found.
+     */
+    public void deleteRestaurant(Integer restaurantId) {
+        restaurantRepository.deleteById(restaurantId);
+    }
+
+
+    /**
+     * Deletes a cuisine from a restaurant.
+     * @param restaurantId The ID of the restaurant to delete the cuisine from.
+     * @param cuisineId The ID of the cuisine to delete.
+     * @throws RestaurantNotFoundException if the restaurant is not found.
+     * @throws CuisineNotFoundException if the cuisine is not found.
+     */
+    public void deleteCuisineFromRestaurant(Integer restaurantId, Integer cuisineId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found"));
+
+        CuisineTypes cuisine = cuisineTypesRepository.findById(cuisineId)
+                .orElseThrow(() -> new CuisineNotFoundException("Cuisine not found"));
+
+        restaurant.getCuisineTypes().remove(cuisine);
+        cuisineTypesRepository.delete(cuisine);
+    }
 }
