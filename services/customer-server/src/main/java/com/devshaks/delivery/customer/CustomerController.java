@@ -32,7 +32,7 @@ public class CustomerController {
 
     // Endpoint to update an existing customer
     // Update an existing customer and return 204 No Content
-    @PutMapping("/{customer-id}")
+    @PutMapping("/update/{customer-id}")
     public ResponseEntity<Void> updateCustomer(@PathVariable("customer-id") Integer customerId,
             @RequestBody @Valid CustomerRequest customerRequest) {
         // Call the customer service to update the customer

@@ -1,5 +1,6 @@
 package com.devshaks.delivery.restaurant;
 
+import com.devshaks.delivery.cuisine.CuisineRequest;
 import com.devshaks.delivery.cuisine.CuisineTypes;
 import com.devshaks.delivery.cuisine.CuisineTypesRepository;
 import com.devshaks.delivery.cuisine.CuisineTypesResponse;
@@ -12,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -196,7 +200,7 @@ public class RestaurantService {
                 .collect(Collectors.toList());
 
     }
-
+    
 
     /**
      * Deletes a restaurant by its ID.
@@ -224,5 +228,91 @@ public class RestaurantService {
 
         restaurant.getCuisineTypes().remove(cuisine);
         cuisineTypesRepository.delete(cuisine);
+    }
+
+    /**
+     * Updates the details of a restaurant.
+     * @param restaurantId The ID of the restaurant to update.
+     * @param restaurantRequest The updated details of the restaurant.
+     * @throws RestaurantNotFoundException if the restaurant is not found.
+     */
+    public void updateRestaurantDetails(Integer restaurantId, RestaurantRequest restaurantRequest) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found with ID: " + restaurantId));
+
+        if (!restaurant.getName().equals(restaurantRequest.name())) {
+            restaurant.setName(restaurantRequest.name());
+
+        }
+
+        if (!restaurant.getAddress().equals(restaurantRequest.address())) {
+            restaurant.setAddress(restaurantRequest.address());
+        }
+
+        if (!restaurant.getContactNumber().equals(restaurantRequest.contactNumber())) {
+            restaurant.setContactNumber(restaurantRequest.contactNumber());
+        }
+
+        if (!restaurant.getLocation().equals(restaurantRequest.location())) {
+            restaurant.setLocation(restaurantRequest.location());
+        }
+
+        if (!restaurant.getDescription().equals(restaurantRequest.description())) {
+            restaurant.setDescription(restaurantRequest.description());
+        }
+
+        if (!restaurant.getOpeningHours().equals(restaurantRequest.openingHours())) {
+            restaurant.setOpeningHours(restaurantRequest.openingHours());
+        }
+
+        if (!restaurant.getRating().equals(restaurantRequest.rating())) {
+            restaurant.setRating(restaurantRequest.rating());
+        }
+
+        if (!restaurant.getIsOpen().equals(restaurantRequest.isOpen())) {
+            restaurant.setIsOpen(restaurantRequest.isOpen());
+        }
+
+        if (!restaurant.getPriceRange().equals(restaurantRequest.priceRange())) {
+            restaurant.setPriceRange(restaurantRequest.priceRange());
+
+        }
+
+        updateRestaurantCuisines(restaurant, restaurantRequest.cuisineTypes());
+        restaurantRepository.save(restaurant);
+    }
+
+    private void updateRestaurantCuisines(Restaurant restaurant, List<CuisineRequest> cuisineRequests) {
+        Set<CuisineTypes> currentCuisines = new HashSet<>(restaurant.getCuisineTypes());
+        Set<CuisineTypes> updatedCuisines = new HashSet<>();
+
+        for (CuisineRequest cuisineRequest : cuisineRequests) {
+            CuisineTypes cuisine;
+
+            // Check if the ID is null, meaning this is a new cuisine to be created
+            if (cuisineRequest.id() != null) {
+                // If the ID is not null, try to fetch the existing cuisine
+                cuisine = cuisineTypesRepository.findById(cuisineRequest.id())
+                        .orElseThrow(() -> new IllegalArgumentException("Cuisine not found with ID: " + cuisineRequest.id()));
+            } else {
+                // If the ID is null, create a new cuisine
+                cuisine = new CuisineTypes();
+                cuisine.setRestaurant(restaurant);  // Set the restaurant
+            }
+
+            // Now set the cuisine details from the request (whether new or existing)
+            cuisine.setName(cuisineRequest.name());
+            cuisine.setDescription(cuisineRequest.description());
+            cuisine.setPrice(cuisineRequest.price());
+
+            // Save the new/updated cuisine to the repository
+            updatedCuisines.add(cuisineTypesRepository.save(cuisine));
+        }
+
+        // Handle removal of old cuisines
+        currentCuisines.removeAll(updatedCuisines);
+        cuisineTypesRepository.deleteAll(currentCuisines);
+
+        restaurant.setCuisineTypes(new ArrayList<>(updatedCuisines));
     }
 }

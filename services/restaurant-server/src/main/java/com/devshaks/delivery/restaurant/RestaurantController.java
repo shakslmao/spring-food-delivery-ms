@@ -4,7 +4,6 @@ import com.devshaks.delivery.cuisine.CuisineTypes;
 import com.devshaks.delivery.cuisine.CuisineTypesResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +41,7 @@ public class RestaurantController {
         return ResponseEntity.created(location).build();
     }
 
-    // TODO:
+
     /**
      * Endpoint to fetch all cuisines of a restaurant.
      * @param restaurantId The ID of the restaurant to retrieve cuisines from.
@@ -80,9 +79,22 @@ public class RestaurantController {
         return ResponseEntity.noContent().build();
     }
 
-    // Update Restaurant
 
-    // Update Cuisine from Restaurant
+    /**
+     * Endpoint to update the details of a restaurant.
+     *
+     * @param restaurantId
+     *            The ID of the restaurant to update.
+     * @param restaurantRequest
+     *            A valid RestaurantRequest object containing the updated details of
+     *            the restaurant.
+     * @return A ResponseEntity with a 204 NO CONTENT status.
+     */
+    @PutMapping("/update/{restaurantId}")
+    public ResponseEntity<Void> updateRestaurantDetails(@PathVariable("restaurantId") Integer restaurantId, @RequestBody @Valid RestaurantRequest restaurantRequest) {
+        restaurantService.updateRestaurantDetails(restaurantId, restaurantRequest);
+        return ResponseEntity.noContent().build();
+    }
 
 
     /**
