@@ -180,4 +180,19 @@ public class RestaurantService {
 
         return cuisineTypesRepository.save(newCuisine);
     }
+
+
+    /**
+     * Fetches all cuisine types for a restaurant.
+     * @param restaurantId The ID of the restaurant to fetch cuisine types for.
+     * @return A list of CuisineTypesResponse objects containing the details of the cuisine types.
+     */
+    public List<CuisineTypesResponse> findCuisineByRestaurantId(Integer restaurantId) {
+        return cuisineTypesRepository.findCuisineTypesByRestaurantId(restaurantId).stream()
+                .map(restaurantMapper::toCuisineResponse)
+                .collect(Collectors.toList());
+
+    }
+
+
 }

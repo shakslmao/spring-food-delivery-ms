@@ -93,4 +93,14 @@ public class RestaurantMapper {
                 restaurant.getId(), // Map restaurant ID
                 restaurant.getName()); // Map restaurant name
     }
+
+    public CuisineTypesResponse toCuisineResponse(CuisineTypes cuisineTypes) {
+        return new CuisineTypesResponse(
+                cuisineTypes.getId(),
+                cuisineTypes.getName(),
+                cuisineTypes.getDescription(),
+                cuisineTypes.getPrice(),
+                cuisineTypes.getRestaurant().getId()
+        );
+    }
 }

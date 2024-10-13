@@ -42,7 +42,17 @@ public class RestaurantController {
     }
 
     // TODO:
-    // Add a new endpoint to fetch all cuisines of a restaurant
+    /**
+     * Endpoint to fetch all cuisines of a restaurant.
+     * @param restaurantId The ID of the restaurant to retrieve cuisines from.
+     * @return A ResponseEntity containing a list of CuisineTypesResponse objects and a 200 OK status.
+     */
+    @GetMapping("/{restaurantId}/cuisine")
+    public ResponseEntity<List<CuisineTypesResponse>> findCuisineByRestaurantId(@PathVariable("restaurantId") Integer restaurantId) {
+        return ResponseEntity.ok(restaurantService.findCuisineByRestaurantId(restaurantId));
+    }
+
+
 
     // Delete Restaurant
 
