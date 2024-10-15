@@ -3,3 +3,11 @@ spring:
         import: optional:configserver:http://localhost:8888
     application:
         name: customer-service
+
+
+
+logging:
+    level:
+        org:
+            springframework:
+                security: DEBUG

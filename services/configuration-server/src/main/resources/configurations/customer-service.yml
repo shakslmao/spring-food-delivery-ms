@@ -9,10 +9,11 @@ spring:
             ddl-auto: update
         database: postgresql
         database-platform: org.hibernate.dialect.PostgreSQLDialect
+application:
+    config:
+        restaurants-url: http://localhost:8222/restaurants
 
 server:
     port: 8090
 
-application:
-    config:
-        restaurants-url: http://localhost:8222/restaurants
+

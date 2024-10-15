@@ -1,5 +1,6 @@
 package com.devshaks.delivery.customer;
 
+import com.devshaks.delivery.customer.address.Address;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,7 @@ public class CustomerMapper {
         if (customerRequest == null) {
             return null;
         }
+        Address address = mapAddressToRequest(customerRequest.address());
         return Customer.builder()
                 .id(customerRequest.id())
                 .username(customerRequest.username())
@@ -16,7 +18,20 @@ public class CustomerMapper {
                 .lastName(customerRequest.lastName())
                 .email(customerRequest.email())
                 .phoneNumber(customerRequest.phoneNumber())
-                .address(customerRequest.address())
+                .address(address)
+                .build();
+    }
+
+    private Address mapAddressToRequest(Address addressRequest) {
+        if (addressRequest == null) {
+            return null;
+        }
+        return Address.builder()
+                .street(addressRequest.getStreet())
+                .houseNumber(addressRequest.getHouseNumber())
+                .city(addressRequest.getCity())
+                .postCode(addressRequest.getPostCode())
+                .country(addressRequest.getCountry())
                 .build();
     }
 

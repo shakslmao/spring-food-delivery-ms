@@ -4,6 +4,8 @@ import com.devshaks.delivery.customer.address.Address;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -23,11 +25,11 @@ public class Customer {
     private String email;
     private String phoneNumber;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "address_id")
     private Address address;
 
     @ManyToMany
     @JoinTable(name = "customer_favourite_restaurants", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "restaurant_id"))
-    private Set<FavouriteRestaurants> favouriteRestaurants;
+    private List<FavouriteRestaurants> favouriteRestaurants;
 }

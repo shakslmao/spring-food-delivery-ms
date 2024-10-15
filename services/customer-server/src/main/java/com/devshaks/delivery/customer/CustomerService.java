@@ -1,5 +1,7 @@
 package com.devshaks.delivery.customer;
 
+import com.devshaks.delivery.customer.address.Address;
+import com.devshaks.delivery.customer.address.AddressRepository;
 import com.devshaks.delivery.customer.exceptions.BusinessException;
 import com.devshaks.delivery.customer.exceptions.CustomerNotFoundException;
 import com.devshaks.delivery.customer.exceptions.RestaurantNotFoundException;
@@ -28,14 +30,16 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final RestaurantClient restaurantClient;
+    private final AddressRepository addressRepository;
 
     // Method to create a new customer
     public Integer createCustomer(@Valid CustomerRequest customerRequest) {
         try {
-            // Map the incoming customer request to a customer entity and save it to the repository
-            var customer = customerRepository.save(customerMapper.mapCustomerToRequest(customerRequest));
-            // Return the ID of the newly created customer
-            return customer.getId();
+            Customer customer = customerMapper.mapCustomerToRequest(customerRequest);
+            Address savedAddress = addressRepository.save(customer.getAddress());
+            customer.setAddress(savedAddress);
+            Customer savedCustomer = customerRepository.save(customer);
+            return savedCustomer.getId();
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 log.error("Unauthorized access to create customer: {}", e.getMessage());
