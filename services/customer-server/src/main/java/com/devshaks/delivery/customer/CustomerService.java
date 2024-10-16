@@ -8,7 +8,6 @@ import com.devshaks.delivery.customer.exceptions.RestaurantNotFoundException;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
 import com.devshaks.delivery.customer.handlers.UnauthorizedException;
 import com.devshaks.delivery.customer.restaurants.RestaurantClient;
-import com.devshaks.delivery.customer.restaurants.RestaurantRequest;
 import com.devshaks.delivery.customer.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -105,9 +104,10 @@ public class CustomerService {
     }
 
     // Method to check if a customer exists by their ID
-    public Boolean existingCustomerById(Integer customerId) {
+    public CustomerResponse findCustomerById(Integer customerId) {
         // Return true if the customer exists, false otherwise
-        return customerRepository.findById(customerId).isPresent();
+        return customerRepository.findById(customerId).map(customerMapper::mapCustomerToResponse)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
     }
 
     // Method to delete a customer by their ID
@@ -116,24 +116,30 @@ public class CustomerService {
         customerRepository.deleteById(customerId);
     }
 
-    // TODO: Implement the following methods
+
+
+
+
+
+/////// Requests from Restaurant Microservice ///////
+
     /**
      * Adds a restaurant to the customer's favorite list.
      *
-     * @param customerId        The ID of the customer.
-     * @param restaurantId      The ID of the restaurant to add to favorites.
-     * @param restaurantRequest The restaurant details from the request body.
+     * @param customerId   The ID of the customer.
+     * @param restaurantId The ID of the restaurant to add to favorites.
      */
     @Transactional
-    public void addRestaurantToFavourites(Integer customerId, String restaurantId, RestaurantRequest restaurantRequest) {
+    public void addRestaurantToFavourites(Integer customerId, Integer restaurantId) {
         // Fetch the customer by ID, throw an exception if not found
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
 
         // Fetch the restaurant details from the Restaurant Microservice
-        RestaurantResponse restaurantResponse = restaurantClient.getRestaurantsById(restaurantRequest.restaurantId());
+        RestaurantResponse restaurantResponse = restaurantClient.getRestaurantsById(restaurantId);
+
         if (restaurantResponse == null) {
-            throw new RestaurantNotFoundException("Restaurant with ID: " + restaurantRequest.restaurantId() + " not found");
+            throw new RestaurantNotFoundException("Restaurant with ID: " + restaurantId + " not found");
         }
 
         // Check if the Restaurant is already in customers favourite list

@@ -51,13 +51,8 @@ public class CustomerController {
 
     // Endpoint to check if a customer exists by ID
     @GetMapping("/{customer-id}")
-    public ResponseEntity<Boolean> existingCustomerById(@PathVariable("customer-id") Integer customerId) {
-        // Call the customer service to check if the customer exists and return the
-        // result in the response
-        if (customerService.existingCustomerById(customerId)) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customer-id") Integer customerId) {
+        return ResponseEntity.ok(customerService.findCustomerById(customerId));
     }
 
     // Endpoint to delete a customer by their ID
@@ -67,13 +62,15 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
+
+/////// Requests from Restaurant Microservice ///////
+
     // Add a Restaurant to a customer's favourite list
-    @PostMapping("/{customer-id}/favorite-restaurant/{restaurant-id}")
+    @PostMapping("/{customer-id}/favourite-restaurant/{restaurant-id}")
     public ResponseEntity<Void> addRestaurantToFavourites(
             @PathVariable("customer-id") Integer customerId,
-            @PathVariable("restaurant-id") String restaurantId,
-            @RequestBody @Valid RestaurantRequest restaurantRequest) {
-        customerService.addRestaurantToFavourites(customerId, restaurantId, restaurantRequest);
+            @PathVariable("restaurant-id") Integer restaurantId) {
+        customerService.addRestaurantToFavourites(customerId, restaurantId);
         URI location = URI.create("/api/v1/customers/" + customerId + "/favourite-restaurant/" + restaurantId);
         return ResponseEntity.created(location).build();
     }

@@ -42,7 +42,7 @@ public class RestaurantClient {
             // Builds the URL for the restaurant service's /restaurants/{id} endpoint with
             // the restaurant ID.
             String url = UriComponentsBuilder.fromHttpUrl(restaurantsUrl)
-                    .path("/restaurants/{restaurantId}")
+                    .path("/{restaurantId}")
                     .buildAndExpand(restaurantId)
                     .toUriString();
             // Sends a GET request to the restaurant service's /restaurants/{id} endpoint
@@ -53,7 +53,7 @@ public class RestaurantClient {
             return Optional.ofNullable(response.getBody())
                     .orElseThrow(() -> new BusinessException("Restaurant not found: " + restaurantId));
         } catch (HttpClientErrorException exception) {
-            log.error("Error fetching restaurant details: {}", exception.getMessage());
+            log.error("Error fetching restaurant details for ID {}: {}", restaurantId, exception.getMessage());
             // Handles the case where the restaurant service returns a 4xx error, typically
             // a 404 (not found).
             throw new BusinessException("Restaurant not found: " + restaurantId);
