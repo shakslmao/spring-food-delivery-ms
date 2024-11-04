@@ -1,6 +1,6 @@
 package com.devshaks.delivery.customer.favourites;
 
-import com.devshaks.delivery.customer.Customer;
+import com.devshaks.delivery.customer.customer.Customer;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,25 +8,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class FavouriteRestaurants {
 
     @Id
+    @GeneratedValue
     private Integer id;
+
+    private String restaurantName;
+    private LocalDateTime createdAt;
 
     @ManyToMany(mappedBy = "favouriteRestaurants")
     private List<Customer> customers;
 
-    private String name;
-    private LocalDateTime createdAt;
-
-    public FavouriteRestaurants(Integer id, String name, LocalDateTime createdAt) {
-        this.id = id;
-        this.name = name;
-        this.createdAt = createdAt;
-    }
 }

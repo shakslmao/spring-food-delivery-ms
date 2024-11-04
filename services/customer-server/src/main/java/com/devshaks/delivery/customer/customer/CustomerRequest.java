@@ -1,4 +1,4 @@
-package com.devshaks.delivery.customer;
+package com.devshaks.delivery.customer.customer;
 
 import com.devshaks.delivery.customer.address.Address;
 import jakarta.validation.constraints.Email;

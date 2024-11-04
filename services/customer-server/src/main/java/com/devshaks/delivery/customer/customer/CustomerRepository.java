@@ -1,4 +1,4 @@
-package com.devshaks.delivery.customer;
+package com.devshaks.delivery.customer.customer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,4 +1,4 @@
-package com.devshaks.delivery.customer;
+package com.devshaks.delivery.customer.customer;
 
 import com.devshaks.delivery.customer.address.Address;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,6 +29,10 @@ public class Customer {
     private Address address;
 
     @ManyToMany
-    @JoinTable(name = "customer_favourite_restaurants", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "restaurant_id"))
+    @JoinTable(
+            name = "customer_favourite_restaurants",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "restaurant_id")
+    )
     private List<FavouriteRestaurants> favouriteRestaurants;
 }

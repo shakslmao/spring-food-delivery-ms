@@ -22,5 +22,12 @@ logging:
     level:
         org.springframework.security.oauth2.server.resource: DEBUG
 
+application:
+    config:
+        #restaurant-service-url: http://localhost:8222/api/v1/restaurants
+
+
+
+
 server:
     port: 8222
