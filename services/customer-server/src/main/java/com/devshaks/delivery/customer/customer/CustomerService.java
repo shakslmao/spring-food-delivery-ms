@@ -10,19 +10,18 @@ import com.devshaks.delivery.customer.favourites.FavouriteRestaurantRepository;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
 import com.devshaks.delivery.customer.handlers.UnauthorizedException;
 
+import com.devshaks.delivery.customer.kafka.FavouriteProducer;
 import com.devshaks.delivery.customer.restaurants.RestaurantDTO;
 import com.devshaks.delivery.customer.restaurants.RestaurantFeignClient;
-import com.devshaks.delivery.customer.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +35,7 @@ public class CustomerService {
     private final RestaurantFeignClient restaurantFeignClient;
     private final FavouriteRestaurantRepository favouriteRestaurantsRepository;
     private final FavouriteMapper favouriteMapper;
+    private final FavouriteProducer favouriteEventProducer;
 
 
     // Method to create a new customer
@@ -137,6 +137,8 @@ public class CustomerService {
         customer.getFavouriteRestaurants().add(favouriteRestaurants);
         favouriteRestaurantsRepository.save(favouriteRestaurants);
         customerRepository.save(customer);
+        // Publish to Kafka
+        favouriteEventProducer.sendFavouriteEvent(restaurantDTO);
     }
 
     // Method to delete a restaurant from a customer's favourite list

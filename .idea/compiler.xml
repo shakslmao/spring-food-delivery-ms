@@ -8,8 +8,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="apigateway" />
-        <module name="discovery-server" />
         <module name="customer-server" />
+        <module name="discovery-server" />
         <module name="restaurant-server" />
         <module name="configuration-server" />
       </profile>
