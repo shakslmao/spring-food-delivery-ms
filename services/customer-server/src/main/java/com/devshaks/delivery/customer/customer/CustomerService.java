@@ -3,6 +3,7 @@ package com.devshaks.delivery.customer.customer;
 import com.devshaks.delivery.customer.address.Address;
 import com.devshaks.delivery.customer.address.AddressRepository;
 import com.devshaks.delivery.customer.exceptions.CustomerNotFoundException;
+import com.devshaks.delivery.customer.exceptions.RestaurantNotFoundException;
 import com.devshaks.delivery.customer.favourites.FavouriteMapper;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurantRepository;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
@@ -31,7 +32,6 @@ public class CustomerService {
     private final RestaurantFeignClient restaurantFeignClient;
     private final FavouriteRestaurantRepository favouriteRestaurantsRepository;
     private final FavouriteMapper favouriteMapper;
-    private final FavouriteRestaurantRepository favouriteRestaurantRepository;
 
 
     // Method to create a new customer
@@ -118,14 +118,22 @@ public class CustomerService {
         customerRepository.deleteById(customerId);
     }
 
+    // Method to add a restaurant to a customer's favourite list
     public void addRestaurantToFavourites(Integer customerId, Integer restaurantId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
         RestaurantResponse restaurantResponse = restaurantFeignClient.getRestaurantById(restaurantId);
         FavouriteRestaurants favouriteRestaurants = favouriteMapper.mapFavouritesToRestaurantResponse(restaurantResponse);
         customer.getFavouriteRestaurants().add(favouriteRestaurants);
-        favouriteRestaurantRepository.save(favouriteRestaurants);
+        favouriteRestaurantsRepository.save(favouriteRestaurants);
         customerRepository.save(customer);
     }
 
-
+    // Method to delete a restaurant from a customer's favourite list
+    public void deleteRestaurantFromFavourites(Integer customerId, Integer restaurantId) {
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+        FavouriteRestaurants favouriteRestaurants = favouriteRestaurantsRepository.findById(restaurantId).orElseThrow(() -> new RestaurantNotFoundException("Restaurant with ID: " + restaurantId + " not found"));
+        customer.getFavouriteRestaurants().remove(favouriteRestaurants);
+        favouriteRestaurantsRepository.delete(favouriteRestaurants);
+        customerRepository.save(customer);
+    }
 }

@@ -11,9 +11,8 @@ spring:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
 application:
     config:
-        #restaurant-service-url: http://localhost:8222/api/v1/restaurants
-        restaurant-service-url: http://localhost:8050/api/v1/restaurants
-
+        restaurant-service-url: http://localhost:8222/api/v1/restaurants
+        #restaurant-service-url: http://localhost:8050/api/v1/restaurants
 
 server:
     port: 8090

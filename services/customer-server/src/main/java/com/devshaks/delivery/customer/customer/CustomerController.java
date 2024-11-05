@@ -74,5 +74,12 @@ public class CustomerController {
         return ResponseEntity.created(location).build();
     }
 
+    @DeleteMapping("/{customerId}/favourite-restaurant/{restaurantId}")
+    public ResponseEntity<Void> deleteRestaurantFromFavourites(@PathVariable("customerId") Integer customerId,
+                                                               @PathVariable("restaurantId") Integer restaurantId) {
+        customerService.deleteRestaurantFromFavourites(customerId, restaurantId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
