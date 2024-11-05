@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+
 
 @Entity
 @AllArgsConstructor
@@ -18,11 +18,10 @@ public class FavouriteRestaurants {
     @Id
     @GeneratedValue
     private Integer id;
-
-    private String restaurantName;
     private LocalDateTime createdAt;
+    private Integer restaurantId;
 
-    @ManyToMany(mappedBy = "favouriteRestaurants")
-    private List<Customer> customers;
-
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 }

@@ -2,6 +2,7 @@ package com.devshaks.delivery.customer.customer;
 
 import com.devshaks.delivery.customer.address.Address;
 import com.devshaks.delivery.customer.address.AddressRepository;
+import com.devshaks.delivery.customer.exceptions.BusinessException;
 import com.devshaks.delivery.customer.exceptions.CustomerNotFoundException;
 import com.devshaks.delivery.customer.exceptions.RestaurantNotFoundException;
 import com.devshaks.delivery.customer.favourites.FavouriteMapper;
@@ -9,6 +10,7 @@ import com.devshaks.delivery.customer.favourites.FavouriteRestaurantRepository;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
 import com.devshaks.delivery.customer.handlers.UnauthorizedException;
 
+import com.devshaks.delivery.customer.restaurants.RestaurantDTO;
 import com.devshaks.delivery.customer.restaurants.RestaurantFeignClient;
 import com.devshaks.delivery.customer.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
@@ -20,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -121,8 +125,15 @@ public class CustomerService {
     // Method to add a restaurant to a customer's favourite list
     public void addRestaurantToFavourites(Integer customerId, Integer restaurantId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
-        RestaurantResponse restaurantResponse = restaurantFeignClient.getRestaurantById(restaurantId);
-        FavouriteRestaurants favouriteRestaurants = favouriteMapper.mapFavouritesToRestaurantResponse(restaurantResponse);
+        boolean alreadyFavourite = customer.getFavouriteRestaurants().stream()
+                .anyMatch(fav -> fav.getRestaurantId().equals(restaurantId));
+        if (alreadyFavourite) {
+            throw new BusinessException("Restaurant with ID: " + restaurantId + " is already a favourite");
+        }
+
+        RestaurantDTO restaurantDTO = restaurantFeignClient.getRestaurantById(restaurantId);
+        FavouriteRestaurants favouriteRestaurants = favouriteMapper.mapFavouritesToRestaurantResponse(restaurantDTO);
+        favouriteRestaurants.setCustomer(customer);
         customer.getFavouriteRestaurants().add(favouriteRestaurants);
         favouriteRestaurantsRepository.save(favouriteRestaurants);
         customerRepository.save(customer);
@@ -131,9 +142,20 @@ public class CustomerService {
     // Method to delete a restaurant from a customer's favourite list
     public void deleteRestaurantFromFavourites(Integer customerId, Integer restaurantId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
-        FavouriteRestaurants favouriteRestaurants = favouriteRestaurantsRepository.findById(restaurantId).orElseThrow(() -> new RestaurantNotFoundException("Restaurant with ID: " + restaurantId + " not found"));
+        FavouriteRestaurants favouriteRestaurants = customer.getFavouriteRestaurants().stream()
+                .filter(fav -> fav.getRestaurantId().equals(restaurantId))
+                .findFirst()
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant with ID: " + restaurantId + " not found in favourites"));
+
         customer.getFavouriteRestaurants().remove(favouriteRestaurants);
         favouriteRestaurantsRepository.delete(favouriteRestaurants);
         customerRepository.save(customer);
+    }
+
+    public List<RestaurantDTO> getFavouriteRestaurants(Integer customerId) {
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+        return customer.getFavouriteRestaurants().stream()
+                .map(favourite -> restaurantFeignClient.getRestaurantById(favourite.getRestaurantId()))
+                .collect(Collectors.toList());
     }
 }

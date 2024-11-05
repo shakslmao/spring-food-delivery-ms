@@ -28,11 +28,6 @@ public class Customer {
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @ManyToMany
-    @JoinTable(
-            name = "customer_favourite_restaurants",
-            joinColumns = @JoinColumn(name = "customer_id"),
-            inverseJoinColumns = @JoinColumn(name = "restaurant_id")
-    )
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<FavouriteRestaurants> favouriteRestaurants;
 }

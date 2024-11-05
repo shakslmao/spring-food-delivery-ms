@@ -1,5 +1,6 @@
 package com.devshaks.delivery.customer.customer;
 
+import com.devshaks.delivery.customer.restaurants.RestaurantDTO;
 import com.devshaks.delivery.customer.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +66,7 @@ public class CustomerController {
 /////// Requests from Restaurant Microservice ///////
 
     // Add a Restaurant to a customer's favourite list
-    @PostMapping("/{customerId}/favourite-restaurant/{restaurantId}")
+    @PostMapping("/{customerId}/favourite-restaurants/{restaurantId}")
     public ResponseEntity<Void> addRestaurantToFavourites(
             @PathVariable("customerId") Integer customerId,
             @PathVariable("restaurantId") Integer restaurantId) {
@@ -74,12 +75,19 @@ public class CustomerController {
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping("/{customerId}/favourite-restaurant/{restaurantId}")
-    public ResponseEntity<Void> deleteRestaurantFromFavourites(@PathVariable("customerId") Integer customerId,
-                                                               @PathVariable("restaurantId") Integer restaurantId) {
+    // Delete a Restaurant from a customer's favourite list
+    @DeleteMapping("/{customerId}/favourite-restaurants/{restaurantId}")
+    public ResponseEntity<Void> deleteRestaurantFromFavourites(
+            @PathVariable("customerId") Integer customerId,
+            @PathVariable("restaurantId") Integer restaurantId) {
         customerService.deleteRestaurantFromFavourites(customerId, restaurantId);
         return ResponseEntity.noContent().build();
     }
 
+    // Get a list of a customer's favourite restaurants
+    @GetMapping("/{customerId}/favourite-restaurants")
+    public ResponseEntity<List<RestaurantDTO>> getFavouriteRestaurants(@PathVariable("customerId") Integer customerId) {
+        return ResponseEntity.ok(customerService.getFavouriteRestaurants(customerId));
 
+    }
 }
