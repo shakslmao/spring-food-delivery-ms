@@ -10,7 +10,7 @@ import com.devshaks.delivery.customer.favourites.FavouriteRestaurantRepository;
 import com.devshaks.delivery.customer.favourites.FavouriteRestaurants;
 import com.devshaks.delivery.customer.handlers.UnauthorizedException;
 
-import com.devshaks.delivery.customer.kafka.FavouriteProducer;
+import com.devshaks.delivery.customer.kafka.FavouriteEventProducer;
 import com.devshaks.delivery.customer.restaurants.RestaurantDTO;
 import com.devshaks.delivery.customer.restaurants.RestaurantFeignClient;
 import jakarta.validation.Valid;
@@ -35,7 +35,7 @@ public class CustomerService {
     private final RestaurantFeignClient restaurantFeignClient;
     private final FavouriteRestaurantRepository favouriteRestaurantsRepository;
     private final FavouriteMapper favouriteMapper;
-    private final FavouriteProducer favouriteEventProducer;
+    private final FavouriteEventProducer favouriteEventProducer;
 
 
     // Method to create a new customer
@@ -148,10 +148,11 @@ public class CustomerService {
                 .filter(fav -> fav.getRestaurantId().equals(restaurantId))
                 .findFirst()
                 .orElseThrow(() -> new RestaurantNotFoundException("Restaurant with ID: " + restaurantId + " not found in favourites"));
-
+        RestaurantDTO restaurantDTO = restaurantFeignClient.getRestaurantById(restaurantId);
         customer.getFavouriteRestaurants().remove(favouriteRestaurants);
         favouriteRestaurantsRepository.delete(favouriteRestaurants);
         customerRepository.save(customer);
+        favouriteEventProducer.sendFavouriteRemovalEvent(restaurantDTO);
     }
 
     public List<RestaurantDTO> getFavouriteRestaurants(Integer customerId) {

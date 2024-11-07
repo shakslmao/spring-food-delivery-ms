@@ -12,5 +12,4 @@ public class CustomerServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(CustomerServerApplication.class, args);
     }
-
 }

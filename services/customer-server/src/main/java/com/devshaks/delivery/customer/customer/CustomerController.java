@@ -88,6 +88,5 @@ public class CustomerController {
     @GetMapping("/{customerId}/favourite-restaurants")
     public ResponseEntity<List<RestaurantDTO>> getFavouriteRestaurants(@PathVariable("customerId") Integer customerId) {
         return ResponseEntity.ok(customerService.getFavouriteRestaurants(customerId));
-
     }
 }

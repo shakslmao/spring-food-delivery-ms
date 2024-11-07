@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class FavouriteProducer {
+public class FavouriteEventProducer {
     private final KafkaTemplate<String, RestaurantDTO> kafkaTemplate;
 
     public void sendFavouriteEvent(RestaurantDTO restaurantDTO) {
@@ -20,6 +20,15 @@ public class FavouriteProducer {
         Message<RestaurantDTO> message = MessageBuilder
                 .withPayload(restaurantDTO)
                 .setHeader(KafkaHeaders.TOPIC, "favourite-topic")
+                .build();
+        kafkaTemplate.send(message);
+    }
+
+    public void sendFavouriteRemovalEvent(RestaurantDTO restaurantDTO) {
+        log.info("Sending favourite removal event to kafka topic: {}", restaurantDTO);
+        Message<RestaurantDTO> message = MessageBuilder
+                .withPayload(restaurantDTO)
+                .setHeader(KafkaHeaders.TOPIC, "favourite-removal-topic")
                 .build();
         kafkaTemplate.send(message);
     }
