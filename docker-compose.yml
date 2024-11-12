@@ -3,8 +3,8 @@ services:
         container_name: delivery-ms-postgres
         image: postgres
         environment:
-            POSTGRES_USER: root
-            POSTGRES_PASSWORD: root
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
             PGDATA: /var/lib/postgresql/data/pgdata
         volumes:
             - postgres:/var/lib/postgresql/data
@@ -18,8 +18,8 @@ services:
         container_name: delivery-ms-pgadmin
         image: dpage/pgadmin4
         environment:
-            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin@pgadmin.org}
-            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
             PGADMIN_CONFIG_SERVER_MODE: "False"
         volumes:
             - pgadmin:/var/lib/pgadmin
@@ -80,12 +80,30 @@ services:
         ports:
             - 9098:8080
         environment:
-            KEYCLOAK_ADMIN: root
-            KEYCLOAK_ADMIN_PASSWORD: root
+            KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+            KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
         networks:
             - delivery-microservices-network
         command:
             - "start-dev"
+
+    customer-service:
+        build:
+            context: ./services/customer-server
+        image: delivery-ms-customer-service
+        ports:
+            - 8090:8090
+        environment:
+            SPRING_PROFILES_ACTIVE: development
+            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/customerdb
+            SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+            SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+            SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:9092
+        networks:
+            - delivery-microservices-network
+        depends_on:
+            - postgres
+            - kafka
 
 networks:
     delivery-microservices-network:

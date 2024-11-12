@@ -1,7 +1,6 @@
 package com.devshaks.delivery.customer.customer;
 
 import com.devshaks.delivery.customer.restaurants.RestaurantDTO;
-import com.devshaks.delivery.customer.restaurants.RestaurantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +61,7 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
-
-/////// Requests from Restaurant Microservice ///////
+    /////// Requests from Restaurant Microservice ///////
 
     // Add a Restaurant to a customer's favourite list
     @PostMapping("/{customerId}/favourite-restaurants/{restaurantId}")

@@ -37,7 +37,6 @@ public class CustomerService {
     private final FavouriteMapper favouriteMapper;
     private final FavouriteEventProducer favouriteEventProducer;
 
-
     // Method to create a new customer
     public Integer createCustomer(@Valid CustomerRequest customerRequest) {
         try {
@@ -124,7 +123,8 @@ public class CustomerService {
 
     // Method to add a restaurant to a customer's favourite list
     public void addRestaurantToFavourites(Integer customerId, Integer restaurantId) {
-        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
         boolean alreadyFavourite = customer.getFavouriteRestaurants().stream()
                 .anyMatch(fav -> fav.getRestaurantId().equals(restaurantId));
         if (alreadyFavourite) {
@@ -143,11 +143,13 @@ public class CustomerService {
 
     // Method to delete a restaurant from a customer's favourite list
     public void deleteRestaurantFromFavourites(Integer customerId, Integer restaurantId) {
-        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
         FavouriteRestaurants favouriteRestaurants = customer.getFavouriteRestaurants().stream()
                 .filter(fav -> fav.getRestaurantId().equals(restaurantId))
                 .findFirst()
-                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant with ID: " + restaurantId + " not found in favourites"));
+                .orElseThrow(() -> new RestaurantNotFoundException(
+                        "Restaurant with ID: " + restaurantId + " not found in favourites"));
         RestaurantDTO restaurantDTO = restaurantFeignClient.getRestaurantById(restaurantId);
         customer.getFavouriteRestaurants().remove(favouriteRestaurants);
         favouriteRestaurantsRepository.delete(favouriteRestaurants);
@@ -156,7 +158,8 @@ public class CustomerService {
     }
 
     public List<RestaurantDTO> getFavouriteRestaurants(Integer customerId) {
-        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + customerId + " not found"));
         return customer.getFavouriteRestaurants().stream()
                 .map(favourite -> restaurantFeignClient.getRestaurantById(favourite.getRestaurantId()))
                 .collect(Collectors.toList());

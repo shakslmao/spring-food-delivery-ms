@@ -24,5 +24,3 @@ application:
 
 server:
     port: 8090
-
-
