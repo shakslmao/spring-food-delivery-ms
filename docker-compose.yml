@@ -90,7 +90,7 @@ services:
     customer-service:
         build:
             context: ./services/customer-server
-        image: delivery-ms-customer-service
+        image: customer-service
         ports:
             - 8090:8090
         environment:
@@ -104,6 +104,24 @@ services:
         depends_on:
             - postgres
             - kafka
+
+    restaurant-service:
+        build:
+            context: ./services/restaurant-server
+        image: restaurant-service
+        ports:
+            - 8050:8050
+        environment:
+            SPRING_PROFILES_ACTIVE: development
+            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/restaurantdb
+            SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+            SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+            #SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:9092
+        networks:
+            - delivery-microservices-network
+        depends_on:
+            - postgres
+            #- kafka
 
 networks:
     delivery-microservices-network:

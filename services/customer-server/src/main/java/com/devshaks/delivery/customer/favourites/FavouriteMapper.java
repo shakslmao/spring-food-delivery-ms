@@ -1,8 +1,6 @@
 package com.devshaks.delivery.customer.favourites;
 
 import com.devshaks.delivery.customer.restaurants.RestaurantDTO;
-import com.devshaks.delivery.customer.restaurants.RestaurantResponse;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
