@@ -1,5 +1,6 @@
 spring:
     datasource:
+        #url: jdbc:postgresql://postgres:5432/customerdb
         url: jdbc:postgresql://localhost:5432/customerdb
         username: root
         password: root
@@ -20,7 +21,11 @@ spring:
 application:
     config:
         restaurant-service-url: http://localhost:8222/api/v1/restaurants
-        #restaurant-service-url: http://localhost:8050/api/v1/restaurants
+        #restaurant-service-url: http://restaurant-service:8222/api/v1/restaurants
 
 server:
     port: 8090
+#eureka:
+#instance:
+#preferIpAddress: true
+#hostname: customer-server

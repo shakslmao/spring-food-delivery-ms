@@ -41,21 +41,25 @@ public class RestaurantController {
         return ResponseEntity.created(location).build();
     }
 
-
     /**
      * Endpoint to fetch all cuisines of a restaurant.
-     * @param restaurantId The ID of the restaurant to retrieve cuisines from.
-     * @return A ResponseEntity containing a list of CuisineTypesResponse objects and a 200 OK status.
+     * 
+     * @param restaurantId
+     *            The ID of the restaurant to retrieve cuisines from.
+     * @return A ResponseEntity containing a list of CuisineTypesResponse objects
+     *         and a 200 OK status.
      */
     @GetMapping("/{restaurantId}/cuisine")
-    public ResponseEntity<List<CuisineTypesResponse>> findCuisineByRestaurantId(@PathVariable("restaurantId") Integer restaurantId) {
+    public ResponseEntity<List<CuisineTypesResponse>> findCuisineByRestaurantId(
+            @PathVariable("restaurantId") Integer restaurantId) {
         return ResponseEntity.ok(restaurantService.findCuisineByRestaurantId(restaurantId));
     }
 
-
     /**
      * Endpoint to delete a restaurant by its ID.
-     * @param restaurantId The ID of the restaurant to delete.
+     * 
+     * @param restaurantId
+     *            The ID of the restaurant to delete.
      * @return A ResponseEntity with a 204 NO CONTENT status.
      */
     @DeleteMapping("/delete/{restaurantId}")
@@ -66,19 +70,20 @@ public class RestaurantController {
 
     /**
      * Endpoint to delete a cuisine from a restaurant.
-     * @param restaurantId The ID of the restaurant to delete the cuisine from.
-     * @param cuisineId The ID of the cuisine to delete.
+     * 
+     * @param restaurantId
+     *            The ID of the restaurant to delete the cuisine from.
+     * @param cuisineId
+     *            The ID of the cuisine to delete.
      * @return A ResponseEntity with a 204 NO CONTENT status.
      */
     @DeleteMapping("/delete/{restaurantId}/cuisine/{cuisineId}")
     public ResponseEntity<Void> deleteCuisineFromRestaurant(
             @PathVariable("restaurantId") Integer restaurantId,
-            @PathVariable("cuisineId") Integer cuisineId
-    ) {
+            @PathVariable("cuisineId") Integer cuisineId) {
         restaurantService.deleteCuisineFromRestaurant(restaurantId, cuisineId);
         return ResponseEntity.noContent().build();
     }
-
 
     /**
      * Endpoint to update the details of a restaurant.
@@ -91,11 +96,11 @@ public class RestaurantController {
      * @return A ResponseEntity with a 204 NO CONTENT status.
      */
     @PutMapping("/update/{restaurantId}")
-    public ResponseEntity<Void> updateRestaurantDetails(@PathVariable("restaurantId") Integer restaurantId, @RequestBody @Valid RestaurantRequest restaurantRequest) {
+    public ResponseEntity<Void> updateRestaurantDetails(@PathVariable("restaurantId") Integer restaurantId,
+            @RequestBody @Valid RestaurantRequest restaurantRequest) {
         restaurantService.updateRestaurantDetails(restaurantId, restaurantRequest);
         return ResponseEntity.noContent().build();
     }
-
 
     /**
      * Endpoint to fetch details of a restaurant by its ID.
@@ -111,7 +116,6 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.findRestaurantById(restaurantId));
     }
 
-
     /**
      * Endpoint to fetch details of all restaurants.
      *
@@ -124,7 +128,6 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.findAllRestaurants());
 
     }
-
 
     /**
      * Endpoint to search for restaurants by their IDs.
@@ -140,7 +143,6 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.findRestaurantByIds(restaurantIds));
     }
 
-
     /**
      * Endpoint to add a new cuisine to a restaurant.
      *
@@ -153,13 +155,13 @@ public class RestaurantController {
      *         a 200 OK status.
      */
     @PostMapping("/restaurants/{restaurantId}/cuisine")
-    public ResponseEntity<CuisineTypes> addCuisineToRestaurant(@PathVariable("restaurantId") Integer restaurantId, @RequestBody CuisineTypesResponse cuisine) {
+    public ResponseEntity<CuisineTypes> addCuisineToRestaurant(@PathVariable("restaurantId") Integer restaurantId,
+            @RequestBody CuisineTypesResponse cuisine) {
         // Calls the service to add a new cuisine to the restaurant
         CuisineTypes newCuisine = restaurantService.addCuisineToRestaurant(restaurantId, cuisine);
         // Returns a response with the newly created cuisine and a 201 CREATED status
         return ResponseEntity.ok(newCuisine);
     }
-
 
     /**
      * Endpoint to handle a purchase request from a specific restaurant.

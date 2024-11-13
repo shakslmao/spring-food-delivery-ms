@@ -8,11 +8,17 @@ services:
             PGDATA: /var/lib/postgresql/data/pgdata
         volumes:
             - postgres:/var/lib/postgresql/data
+            # - ./init-multiple-dbs.sql:/docker-entrypoint-initdb.d/init-multiple-dbs.sql
         ports:
             - 5432:5432
         networks:
             - delivery-microservices-network
         restart: unless-stopped
+        #healthcheck:
+        #test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+        #interval: 10s
+        #timeout: 5s
+        #retries: 5
 
     pgadmin:
         container_name: delivery-ms-pgadmin
@@ -58,6 +64,11 @@ services:
             KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
         networks:
             - delivery-microservices-network
+        # healthcheck:
+        # test: ["CMD-SHELL", "echo > /dev/tcp/localhost/9092"]
+        # interval: 10s
+        #  timeout: 5s
+        # retries: 5
 
     mail-dev:
         container_name: delivery-ms-mail-dev
@@ -87,41 +98,123 @@ services:
         command:
             - "start-dev"
 
-    customer-service:
-        build:
-            context: ./services/customer-server
-        image: customer-service
-        ports:
-            - 8090:8090
-        environment:
-            SPRING_PROFILES_ACTIVE: development
-            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/customerdb
-            SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-            SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-            SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:9092
-        networks:
-            - delivery-microservices-network
-        depends_on:
-            - postgres
-            - kafka
+    # configuration-server:
+    # build:
+    # context: ./services/configuration-server
+    # image: configuration-server
+    # ports:
+    # - 8888:8888
+    # environment:
+    #  SPRING_PROFILES_ACTIVE: native
+    # EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    # EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
+    # networks:
+    # - delivery-microservices-network
+    # healthcheck:
+    # test: ["CMD", "curl", "-f", "http://configuration-server:8888/actuator/health"]
+    # interval: 10s
+    # timeout: 10s
+    # retries: 5
+    # start_period: 20s
 
-    restaurant-service:
-        build:
-            context: ./services/restaurant-server
-        image: restaurant-service
-        ports:
-            - 8050:8050
-        environment:
-            SPRING_PROFILES_ACTIVE: development
-            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/restaurantdb
-            SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-            SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-            #SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:9092
-        networks:
-            - delivery-microservices-network
-        depends_on:
-            - postgres
-            #- kafka
+    # discovery-server:
+    # build:
+    # context: ./services/discovery-server
+    # image: discovery-server
+    # ports:
+    # - "8761:8761"
+    # environment:
+    # SPRING_PROFILES_ACTIVE: native
+    # EUREKA_INSTANCE_HOSTNAME: discovery-server
+    # EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
+    # EUREKA_CLIENT_FETCH_REGISTRY: false
+    # EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    # EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
+    # SPRING_CONFIG_IMPORT: optional:configserver:http://configuration-server:8888
+    # SPRING_CLOUD_CONFIG_URI:
+    # networks:
+    # - delivery-microservices-network
+    # depends_on:
+    # configuration-server:
+    # condition: service_healthy
+    # healthcheck:
+    # test: ["CMD", "curl", "-f", "http://discovery-server:8761/actuator/health"]
+    # interval: 10s
+    # timeout: 10s
+    # retries: 5
+    # start_period: 30s
+
+    # apigateway-server:
+    # build:
+    # context: ./services/apigateway
+    # image: apigateway-server
+    # ports:
+    # - "8222:8222"
+    # environment:
+    # SPRING_PROFILES_ACTIVE: native
+    # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/delivery-microservice
+    # SPRING_CLOUD_DISCOVERY_LOCATOR_ENABLED: "true"
+    # EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    # EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
+    # networks:
+    # - delivery-microservices-network
+    # depends_on:
+    # configuration-server:
+    # condition: service_healthy
+    # discovery-server:
+    # condition: service_healthy
+
+    # customer-server:
+    # build:
+    # context: ./services/customer-server
+    # image: customer-server
+    # ports:
+    # - 8090:8090
+    # environment:
+    # SPRING_PROFILES_ACTIVE: native
+    # SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/customerdb
+    # SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+    # SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    # SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:9092
+    # EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    # EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
+    # networks:
+    # - delivery-microservices-network
+    # depends_on:
+    # postgres:
+    # condition: service_healthy
+    # kafka:
+    # condition: service_healthy
+    # configuration-server:
+    # condition: service_healthy
+    # discovery-server:
+    # condition: service_healthy
+
+    # restaurant-server:
+    # build:
+    # context: ./services/restaurant-server
+    # image: restaurant-server
+    # ports:
+    # - 8050:8050
+    # environment:
+    # SPRING_PROFILES_ACTIVE: native
+    # SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/restaurantdb
+    # SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+    # SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    # EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    # EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
+    # EUREKA_INSTANCE_HOSTNAME: restaurant-server
+    # SPRING_APPLICATION_NAME: restaurant-service
+    # SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:9092
+    # networks:
+    # - delivery-microservices-network
+    # depends_on:
+    # postgres:
+    # condition: service_healthy
+    # configuration-server:
+    # condition: service_healthy
+    # discovery-server:
+    # condition: service_healthy
 
 networks:
     delivery-microservices-network:

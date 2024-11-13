@@ -4,6 +4,7 @@ spring:
             resourceserver:
                 jwt:
                     issuer-uri: "http://localhost:9098/realms/delivery-microservice"
+                    #issuer-uri: "http://keycloak:8080/realms/delivery-microservice"
     cloud:
         gateway:
             discovery:
@@ -28,3 +29,7 @@ application:
 
 server:
     port: 8222
+#eureka:
+# instance:
+#        preferIpAddress: true
+#       hostname: apigateway-server
