@@ -1,6 +1,7 @@
 package com.devshaks.delivery.order;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Integer> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
+    public ResponseEntity<UUID> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
         return ResponseEntity.ok(orderService.createOrder(orderRequest));
     }
 

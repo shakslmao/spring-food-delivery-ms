@@ -1,9 +1,13 @@
 package com.devshaks.delivery.order;
 
+import com.devshaks.delivery.kafka.KafkaOrderProducer;
+import com.devshaks.delivery.kafka.OrderConfirmation;
 import com.devshaks.delivery.orderline.OrderLines;
 import com.devshaks.delivery.payments.PaymentFeignClient;
 import com.devshaks.delivery.payments.PaymentRequest;
 import com.devshaks.delivery.restaurant.RestaurantFeignClient;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.devshaks.delivery.customer.CustomerFeignClient;
@@ -14,8 +18,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -24,15 +30,23 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final PaymentFeignClient paymentFeignClient;
+    private final KafkaOrderProducer kafkaOrderProducer;
 
-    public Integer createOrder(@Valid OrderRequest orderRequest) {
+    @Transactional
+    public UUID createOrder(@Valid OrderRequest orderRequest) {
         try {
+            // find customer by id
             var customer = this.customerFeignClient.findCustomerById(orderRequest.customerId())
                     .orElseThrow(() -> new BusinessException("Customer Was Not Found with ID: " + orderRequest.customerId()));
-            var purchasedProducts = this.restaurantFeignClient.purchaseDelivery(orderRequest.restaurantProducts());
+            // fetch restaurant id from the first item in the list
+            Integer restaurantId = orderRequest.restaurantProducts().get(0).restaurantId();
+            var purchasedProducts = this.restaurantFeignClient.purchaseDelivery(restaurantId,orderRequest.restaurantProducts());
+
+            // map order request to order and set order status to be PENDING.
             var order = orderMapper.mapToOrder(orderRequest);
             order.setOrderStatus(OrderStatus.PENDING);
 
+            // create OrderLines and calculate total amount
             List<OrderLines> items = purchasedProducts.stream()
                     .flatMap(response -> response.items().stream())
                     .map(item -> {
@@ -53,21 +67,33 @@ public class OrderService {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             order.setOrderAmount(totalOrderAmount);
 
+            // Save Order
+            var savedOrder = orderRepository.save(order);
+
+            // Prepare and send payment request
             var paymentRequest = new PaymentRequest(
                     orderRequest.orderAmount(),
                     orderRequest.paymentMethod(),
                     order.getOrderReference(),
-                    order.getId(),
+                    savedOrder.getId(),
                     customer
             );
 
             paymentFeignClient.requestPayment(paymentRequest);
 
+            // Send order confirmation event to Kafka
+            kafkaOrderProducer.sendOrderConfirmation(new OrderConfirmation(
+                    orderRequest.orderReference(),
+                    orderRequest.orderAmount(),
+                    orderRequest.paymentMethod(),
+                    customer,
+                    purchasedProducts
+            ));
 
+            return order.getOrderReference();
 
-            var savedOrder = orderRepository.save(order);
-            return savedOrder.getId();
         } catch (Exception error) {
+            log.error("Error creating order: ", error);
             throw new BusinessException("Error Creating Order: " + error.getMessage());
         }
     }

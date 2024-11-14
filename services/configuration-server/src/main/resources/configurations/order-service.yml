@@ -21,3 +21,4 @@ application:
     config:
         customer-service-url: http://localhost:8222/api/v1/customers
         restaurant-service-url: http://localhost:8222/api/v1/restaurants
+        payment-service-url: http://localhost:8222/api/v1/payments
