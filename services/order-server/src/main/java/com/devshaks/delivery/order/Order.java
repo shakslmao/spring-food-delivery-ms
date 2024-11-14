@@ -1,5 +1,6 @@
 package com.devshaks.delivery.order;
 
+import com.devshaks.delivery.orderline.OrderLines;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -17,7 +19,6 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "customer_order")
 public class Order {
 
     @Id
@@ -46,4 +47,6 @@ public class Order {
     @Column(insertable = false)
     private LocalDateTime lastModifiedOrderDate;
 
+    @OneToMany(mappedBy = "order")
+    private List<OrderLines> orderLines;
 }

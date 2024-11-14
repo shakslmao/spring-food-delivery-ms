@@ -26,8 +26,6 @@ public record OrderRequest(
 
         @NotNull(message = "Order Items are Required")
         List<RestaurantPurchaseRequest> restaurantProducts
-
-
 ) {
 
 }
