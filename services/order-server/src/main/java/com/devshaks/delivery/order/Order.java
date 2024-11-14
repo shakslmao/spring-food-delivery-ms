@@ -36,7 +36,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    private String customerId;
+    private Integer customerId;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)

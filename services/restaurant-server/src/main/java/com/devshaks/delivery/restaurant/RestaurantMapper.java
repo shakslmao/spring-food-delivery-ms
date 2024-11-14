@@ -14,10 +14,6 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class RestaurantMapper {
-
-    // Injecting CuisineTypesRepository dependency using constructor-based injection (thanks to @AllArgsConstructor).
-    private final CuisineTypesRepository cuisineTypesRepository;
-
     // Method to map a RestaurantRequest object to a Restaurant entity
     public Restaurant mapRestaurantToRequest(@Valid RestaurantRequest restaurantRequest) {
         // Building a Restaurant object from the incoming RestaurantRequest data
@@ -41,7 +37,8 @@ public class RestaurantMapper {
         return restaurant; // Return the fully built Restaurant object
     }
 
-    // Private helper method to map a list of CuisineRequest objects to CuisineTypes entities
+    // Private helper method to map a list of CuisineRequest objects to CuisineTypes
+    // entities
     private List<CuisineTypes> mapCuisineTypes(List<CuisineRequest> cuisineRequests, Restaurant restaurant) {
         return cuisineRequests.stream()
                 .map(cuisineRequest -> CuisineTypes.builder()
@@ -49,7 +46,8 @@ public class RestaurantMapper {
                         .name(cuisineRequest.name()) // Map cuisine name
                         .description(cuisineRequest.description()) // Map cuisine description
                         .price(cuisineRequest.price()) // Map cuisine price
-                        .restaurant(restaurant) // Associate the restaurant with the cuisine type (important for bidirectional mapping)
+                        .restaurant(restaurant) // Associate the restaurant with the cuisine type (important for
+                                                // bidirectional mapping)
                         .build())
                 .collect(Collectors.toList()); // Collect the mapped cuisine types into a list
     }
@@ -77,7 +75,8 @@ public class RestaurantMapper {
                         .collect(Collectors.toList())); // Collect the mapped cuisine types into a list
     }
 
-    // Method to map a Restaurant entity and a CuisineTypes entity to a RestaurantPurchaseResponse DTO
+    // Method to map a Restaurant entity and a CuisineTypes entity to a
+    // RestaurantPurchaseResponse DTO
     public RestaurantPurchaseResponse toRestaurantPurchaseResponse(Restaurant restaurant, CuisineTypes cuisineTypes) {
         return new RestaurantPurchaseResponse(
                 restaurant.getId(), // Map restaurant ID
@@ -87,7 +86,8 @@ public class RestaurantMapper {
                 cuisineTypes); // Map the purchased cuisine type
     }
 
-    // Method to map a Restaurant entity to a RestaurantFavouriteResponse DTO (used for marking favorite restaurants)
+    // Method to map a Restaurant entity to a RestaurantFavouriteResponse DTO (used
+    // for marking favorite restaurants)
     public RestaurantFavouriteResponse toFavouriteRestaurantResponse(Restaurant restaurant) {
         return new RestaurantFavouriteResponse(
                 restaurant.getId(), // Map restaurant ID
@@ -100,7 +100,6 @@ public class RestaurantMapper {
                 cuisineTypes.getName(),
                 cuisineTypes.getDescription(),
                 cuisineTypes.getPrice(),
-                cuisineTypes.getRestaurant().getId()
-        );
+                cuisineTypes.getRestaurant().getId());
     }
 }
