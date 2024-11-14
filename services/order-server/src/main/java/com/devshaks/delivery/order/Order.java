@@ -19,6 +19,7 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "customer_orders")
 public class Order {
 
     @Id
