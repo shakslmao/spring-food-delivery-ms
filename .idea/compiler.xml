@@ -10,6 +10,7 @@
         <module name="apigateway" />
         <module name="customer-server" />
         <module name="discovery-server" />
+        <module name="order-server" />
         <module name="restaurant-server" />
         <module name="configuration-server" />
       </profile>
@@ -21,6 +22,7 @@
       <module name="configuration-server" options="-parameters" />
       <module name="customer-server" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
+      <module name="order-server" options="-parameters" />
       <module name="restaurant-server" options="-parameters" />
     </option>
   </component>
