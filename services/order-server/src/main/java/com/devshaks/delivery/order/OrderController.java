@@ -26,8 +26,9 @@ public class OrderController {
         return ResponseEntity.ok(orderService.createOrder(orderRequest));
     }
 
+    // Event Driven Approach Handler
     @PatchMapping("/{orderId}/status")
-    public ResponseEntity<Void> updateOrderStatus() {
+    public ResponseEntity<Void> updateOrderStatus(@PathVariable String orderId) {
         return null;
     }
 
