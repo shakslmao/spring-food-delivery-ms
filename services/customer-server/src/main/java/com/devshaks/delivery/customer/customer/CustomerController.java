@@ -29,6 +29,12 @@ public class CustomerController {
         return ResponseEntity.created(location).build();
     }
 
+    // Endpoint to check if a customer exists by ID
+    @GetMapping("/{customerId}")
+    public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customerId") Integer customerId) {
+        return ResponseEntity.ok(customerService.findCustomerById(customerId));
+    }
+
     // Endpoint to update an existing customer
     // Update an existing customer and return 204 No Content
     @PutMapping("/update/{customerId}")
@@ -48,11 +54,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.findAllCustomers());
     }
 
-    // Endpoint to check if a customer exists by ID
-    @GetMapping("/{customerId}")
-    public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customerId") Integer customerId) {
-        return ResponseEntity.ok(customerService.findCustomerById(customerId));
-    }
+
 
     // Endpoint to delete a customer by their ID
     @DeleteMapping("/{customerId}")
