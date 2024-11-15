@@ -50,4 +50,11 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     private List<OrderLines> orderLines;
+
+    @PrePersist
+    private void generateOrderReference() {
+        if (orderReference == null) {
+            orderReference = UUID.randomUUID();
+        }
+    }
 }

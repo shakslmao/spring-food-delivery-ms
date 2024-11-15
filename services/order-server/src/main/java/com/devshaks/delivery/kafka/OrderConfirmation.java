@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public record OrderConfirmation(
-        UUID orderReference,
         BigDecimal orderAmount,
         PaymentMethod paymentMethod,
         CustomerResponse customer,

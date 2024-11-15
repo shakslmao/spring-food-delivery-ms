@@ -35,12 +35,24 @@ public class OrderService {
     @Transactional
     public UUID createOrder(@Valid OrderRequest orderRequest) {
         try {
-            // find customer by id
+            if (orderRequest.customerId() == null) {
+                throw new BusinessException("Customer ID is required.");
+            }
+
+            log.info("Fetching customer with ID: {}", orderRequest.customerId());
             var customer = this.customerFeignClient.findCustomerById(orderRequest.customerId())
-                    .orElseThrow(() -> new BusinessException("Customer Was Not Found with ID: " + orderRequest.customerId()));
+                    .orElseThrow(() -> new BusinessException(
+                            "Customer Was Not Found with ID: " + orderRequest.customerId()));
+            log.info("processing order for customer: {}", customer);
+
+            if (orderRequest.restaurantProducts() == null || orderRequest.restaurantProducts().isEmpty()) {
+                throw new BusinessException("No restaurant products provided for the order.");
+            }
+
             // fetch restaurant id from the first item in the list
             Integer restaurantId = orderRequest.restaurantProducts().get(0).restaurantId();
-            var purchasedProducts = this.restaurantFeignClient.purchaseDelivery(restaurantId,orderRequest.restaurantProducts());
+            var purchasedProducts = this.restaurantFeignClient.purchaseDelivery(restaurantId,
+                    orderRequest.restaurantProducts());
 
             // map order request to order and set order status to be PENDING.
             var order = orderMapper.mapToOrder(orderRequest);
@@ -72,23 +84,31 @@ public class OrderService {
 
             // Prepare and send payment request
             var paymentRequest = new PaymentRequest(
-                    orderRequest.orderAmount(),
+                    totalOrderAmount,
                     orderRequest.paymentMethod(),
                     order.getOrderReference(),
                     savedOrder.getId(),
-                    customer
-            );
+                    customer);
 
-            paymentFeignClient.requestPayment(paymentRequest);
+            try {
+                paymentFeignClient.requestPayment(paymentRequest);
+            } catch (Exception paymentError) {
+                log.error("Error processing payment: ", paymentError);
+                throw new BusinessException("Error Processing Payment: " + paymentError.getMessage());
+            }
 
             // Send order confirmation event to Kafka
-            kafkaOrderProducer.sendOrderConfirmation(new OrderConfirmation(
-                    orderRequest.orderReference(),
-                    orderRequest.orderAmount(),
-                    orderRequest.paymentMethod(),
-                    customer,
-                    purchasedProducts
-            ));
+
+            try {
+                kafkaOrderProducer.sendOrderConfirmation(new OrderConfirmation(
+                        totalOrderAmount,
+                        orderRequest.paymentMethod(),
+                        customer,
+                        purchasedProducts));
+            } catch (Exception kafkaError) {
+                log.error("Error sending order confirmation: ", kafkaError);
+                throw new BusinessException("Error Sending Order Confirmation: " + kafkaError.getMessage());
+            }
 
             return order.getOrderReference();
 

@@ -9,8 +9,6 @@ public class OrderMapper {
     public Order mapToOrder(@Valid OrderRequest orderRequest) {
         return Order.builder()
                 .id(orderRequest.id())
-                .orderReference(orderRequest.orderReference())
-                .orderAmount(orderRequest.orderAmount())
                 .paymentMethod(orderRequest.paymentMethod())
                 .customerId(orderRequest.customerId())
                 .build();

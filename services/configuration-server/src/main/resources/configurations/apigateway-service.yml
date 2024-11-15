@@ -4,7 +4,7 @@ spring:
             resourceserver:
                 jwt:
                     issuer-uri: "http://localhost:9098/realms/delivery-microservice"
-                    #issuer-uri: "http://keycloak:8080/realms/delivery-microservice"
+                    #issuer-uri: "http://keycloak:9098/realms/delivery-microservice"
     cloud:
         gateway:
             discovery:
@@ -15,10 +15,21 @@ spring:
                   uri: lb:http://RESTAURANT-SERVICE
                   predicates:
                       - Path=/api/v1/restaurants/**
+
                 - id: customer-service
                   uri: lb:http://CUSTOMER-SERVICE
                   predicates:
                       - Path=/api/v1/customers/**
+
+                - id: order-service
+                  uri: lb:http://ORDER-SERVICE
+                  predicates:
+                      - Path=/api/v1/orders/**
+
+                - id: payment-service
+                  uri: lb:http://PAYMENT-SERVICE
+                  predicates:
+                      - Path=/api/v1/payments/**
 logging:
     level:
         org.springframework.security.oauth2.server.resource: DEBUG
