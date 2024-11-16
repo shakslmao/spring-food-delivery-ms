@@ -10,6 +10,7 @@ import java.util.List;
 
 @FeignClient(name = "restaurant-service", url = "${application.config.restaurant-service-url}", configuration = FeignConfig.class)
 public interface RestaurantFeignClient {
-    @PostMapping("/restaurants/{restaurantId}/purchase")
+    @PostMapping("/{restaurantId}/purchase")
     List<RestaurantPurchaseResponse> purchaseDelivery(@PathVariable("restaurantId") Integer restaurantId, @RequestBody List<RestaurantPurchaseRequest> restaurantPurchaseRequests);
 }
+

@@ -1,24 +1,22 @@
 package com.devshaks.delivery.order;
 
+import com.devshaks.delivery.customer.CustomerResponse;
 import com.devshaks.delivery.kafka.KafkaOrderProducer;
 import com.devshaks.delivery.kafka.OrderConfirmation;
 import com.devshaks.delivery.orderline.OrderLines;
 import com.devshaks.delivery.payments.PaymentFeignClient;
 import com.devshaks.delivery.payments.PaymentRequest;
 import com.devshaks.delivery.restaurant.RestaurantFeignClient;
+import com.devshaks.delivery.restaurant.RestaurantPurchaseRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import com.devshaks.delivery.customer.CustomerFeignClient;
 import com.devshaks.delivery.exceptions.BusinessException;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,7 +31,7 @@ public class OrderService {
     private final KafkaOrderProducer kafkaOrderProducer;
 
     @Transactional
-    public UUID createOrder(@Valid OrderRequest orderRequest) {
+    public Integer createOrder(@Valid OrderRequest orderRequest) {
         try {
             if (orderRequest.customerId() == null) {
                 throw new BusinessException("Customer ID is required.");
@@ -41,24 +39,31 @@ public class OrderService {
 
             log.info("Fetching customer with ID: {}", orderRequest.customerId());
             var customer = this.customerFeignClient.findCustomerById(orderRequest.customerId())
-                    .orElseThrow(() -> new BusinessException(
-                            "Customer Was Not Found with ID: " + orderRequest.customerId()));
-            log.info("processing order for customer: {}", customer);
+                    .orElseThrow(() -> new BusinessException("Customer Was Not Found with ID: " + orderRequest.customerId()));
+            log.info("Processing order for customer: {}", customer);
 
             if (orderRequest.restaurantProducts() == null || orderRequest.restaurantProducts().isEmpty()) {
                 throw new BusinessException("No restaurant products provided for the order.");
             }
 
-            // fetch restaurant id from the first item in the list
+            // Fetch restaurant ID from the first item in the list
             Integer restaurantId = orderRequest.restaurantProducts().get(0).restaurantId();
-            var purchasedProducts = this.restaurantFeignClient.purchaseDelivery(restaurantId,
-                    orderRequest.restaurantProducts());
+            log.info("Attempting to purchase delivery from restaurant ID: {}", restaurantId);
+            log.debug("Purchase request details: {}", orderRequest.restaurantProducts());
 
-            // map order request to order and set order status to be PENDING.
+            // Create a list of RestaurantPurchaseRequest objects
+            List<RestaurantPurchaseRequest> restaurantPurchaseRequests = orderRequest.restaurantProducts().stream()
+                    .map(product -> new RestaurantPurchaseRequest(product.restaurantId(), product.items()))
+                    .collect(Collectors.toList());
+
+            var purchasedProducts = this.restaurantFeignClient.purchaseDelivery(restaurantId, restaurantPurchaseRequests);
+            log.info("Successfully purchased products from restaurant");
+
+            // Map order request to Order entity and set status to PENDING
             var order = orderMapper.mapToOrder(orderRequest);
             order.setOrderStatus(OrderStatus.PENDING);
 
-            // create OrderLines and calculate total amount
+            // Create OrderLines and calculate total amount
             List<OrderLines> items = purchasedProducts.stream()
                     .flatMap(response -> response.items().stream())
                     .map(item -> {
@@ -98,7 +103,6 @@ public class OrderService {
             }
 
             // Send order confirmation event to Kafka
-
             try {
                 kafkaOrderProducer.sendOrderConfirmation(new OrderConfirmation(
                         totalOrderAmount,
@@ -110,11 +114,12 @@ public class OrderService {
                 throw new BusinessException("Error Sending Order Confirmation: " + kafkaError.getMessage());
             }
 
-            return order.getOrderReference();
+            return order.getId();
 
         } catch (Exception error) {
             log.error("Error creating order: ", error);
             throw new BusinessException("Error Creating Order: " + error.getMessage());
         }
     }
+
 }

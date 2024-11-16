@@ -112,7 +112,9 @@ public class CustomerService {
 
     // Method to check if a customer exists by their ID
     public CustomerResponse findCustomerById(Integer customerId) {
-        return null;
+        return customerRepository.findById(customerId)
+                .map(customerMapper::mapCustomerToResponse)
+                .orElse(null);
     }
 
     // Method to delete a customer by their ID

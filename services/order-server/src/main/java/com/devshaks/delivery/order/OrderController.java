@@ -22,7 +22,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<UUID> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
+    public ResponseEntity<Integer> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
         return ResponseEntity.ok(orderService.createOrder(orderRequest));
     }
 

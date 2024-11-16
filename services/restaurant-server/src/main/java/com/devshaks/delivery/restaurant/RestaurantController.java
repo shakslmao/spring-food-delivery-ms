@@ -4,6 +4,7 @@ import com.devshaks.delivery.cuisine.CuisineTypes;
 import com.devshaks.delivery.cuisine.CuisineTypesResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/restaurants")
 @RequiredArgsConstructor
@@ -175,12 +177,12 @@ public class RestaurantController {
      *         objects and a 201 CREATED status.
      */
     @PostMapping("/{restaurantId}/purchase")
-    public ResponseEntity<List<RestaurantPurchaseResponse>> purchaseDelivery(
-            @PathVariable("restaurantId") Integer restaurantId,
-            @RequestBody @Valid List<RestaurantPurchaseRequest> purchaseRequests) {
-        // Calls the service to process the purchase and get a list of responses
-        List<RestaurantPurchaseResponse> responses = restaurantService.purchaseDelivery(purchaseRequests, restaurantId);
-
+    public ResponseEntity<List<RestaurantPurchaseResponse>> handlePurchaseRequest(@PathVariable("restaurantId") Integer restaurantId, @RequestBody @Valid List<RestaurantPurchaseRequest> purchaseRequests) {
+        log.info("Received Purchase Request for ID: {}", restaurantId);
+        log.debug("Purchase request details: {}", purchaseRequests);
+        List<RestaurantPurchaseResponse> responses = restaurantService.handlePurchaseRequest(purchaseRequests, restaurantId);
+        log.info("Successfully processed purchase request for restaurant ID: {}", restaurantId);
+        log.debug("Response details: {}", responses);
         // Returns a response with the purchase details and the created status
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }

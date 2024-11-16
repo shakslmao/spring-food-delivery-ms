@@ -77,6 +77,7 @@ public class RestaurantMapper {
 
     // Method to map a Restaurant entity and a CuisineTypes entity to a
     // RestaurantPurchaseResponse DTO
+    /*
     public RestaurantPurchaseResponse toRestaurantPurchaseResponse(Restaurant restaurant, CuisineTypes cuisineTypes) {
         return new RestaurantPurchaseResponse(
                 restaurant.getId(), // Map restaurant ID
@@ -85,6 +86,8 @@ public class RestaurantMapper {
                 restaurant.getDescription(), // Map restaurant description
                 cuisineTypes); // Map the purchased cuisine type
     }
+
+     */
 
     // Method to map a Restaurant entity to a RestaurantFavouriteResponse DTO (used
     // for marking favorite restaurants)

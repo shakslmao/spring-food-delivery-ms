@@ -32,7 +32,10 @@ public class CustomerController {
     // Endpoint to check if a customer exists by ID
     @GetMapping("/{customerId}")
     public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customerId") Integer customerId) {
-        return ResponseEntity.ok(customerService.findCustomerById(customerId));
+        log.info("Received request to find customer with ID: {}", customerId);
+        CustomerResponse response = customerService.findCustomerById(customerId);
+        log.info("Responding with: {}", response);
+        return ResponseEntity.ok(response);
     }
 
     // Endpoint to update an existing customer
