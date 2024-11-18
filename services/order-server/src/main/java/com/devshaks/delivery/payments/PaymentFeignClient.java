@@ -1,5 +1,6 @@
 package com.devshaks.delivery.payments;
 
+import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,5 +8,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "payment-service", url = "${application.config.payment-service-url}")
 public interface PaymentFeignClient {
     @PostMapping
-    Integer requestPayment(@RequestBody PaymentRequest paymentRequest);
+    void requestPayment(@RequestBody @Valid PaymentRequest paymentRequest);
 }

@@ -9,6 +9,7 @@ import com.devshaks.delivery.payments.PaymentRequest;
 import com.devshaks.delivery.restaurant.RestaurantFeignClient;
 import com.devshaks.delivery.restaurant.RestaurantPurchaseRequest;
 import com.devshaks.delivery.restaurant.RestaurantPurchaseResponse;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -96,6 +97,11 @@ public class OrderService {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             order.setOrderAmount(totalOrderAmount);
 
+            if (totalOrderAmount == null || totalOrderAmount.compareTo(BigDecimal.ZERO) <= 0) {
+                log.error("Order amount is invalid: {}", totalOrderAmount);
+                throw new BusinessException("Order amount is invalid: " + totalOrderAmount);
+            }
+
             // Save Order
             var savedOrder = orderRepository.save(order);
 
@@ -108,10 +114,12 @@ public class OrderService {
                     customer);
 
             try {
+                log.info("Sending Payment Request: {}", paymentRequest);
                 paymentFeignClient.requestPayment(paymentRequest);
-            } catch (Exception paymentError) {
-                log.error("Error processing payment: ", paymentError);
-                throw new BusinessException("Error Processing Payment: " + paymentError.getMessage());
+                log.info("Payment request processed successfully");
+            } catch (FeignException e) {
+                log.error("Error processing payment: Status: {}, Message: {}", e.status(), e.getMessage());
+                throw new BusinessException("Error Processing Payment: " + e.getMessage());
             }
 
             // Send order confirmation event to Kafka

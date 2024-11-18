@@ -42,4 +42,11 @@ public class Payments {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastModifiedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
 }

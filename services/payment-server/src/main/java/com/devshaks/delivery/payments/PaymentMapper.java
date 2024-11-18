@@ -10,7 +10,7 @@ public class PaymentMapper {
                 .id(paymentRequest.id())
                 .orderReference(paymentRequest.orderReference())
                 .paymentMethod(paymentRequest.paymentMethod())
-                .amount(paymentRequest.paymentAmount())
+                .amount(paymentRequest.orderAmount())
                 .build();
 
     }
