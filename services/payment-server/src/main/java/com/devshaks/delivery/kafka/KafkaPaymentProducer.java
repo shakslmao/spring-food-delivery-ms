@@ -8,19 +8,17 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
-public class KafkaOrderProducer {
-    private final KafkaTemplate<String, OrderConfirmation> kafkaTemplate;
-
-    public void sendOrderConfirmation(OrderConfirmation orderConfirmation) {
-        log.info("Sending Order Confirmation to Notification Service: {}", orderConfirmation);
-        Message<OrderConfirmation> message = MessageBuilder
-                .withPayload(orderConfirmation)
-                .setHeader(KafkaHeaders.TOPIC, "order-topic")
+public class KafkaPaymentProducer {
+    private final KafkaTemplate<String, PaymentEvent> kafkaTemplate;
+    public void sendPaymentEvent(PaymentEvent event) {
+        log.info("Sending Payment Event to Order Service: {}", event);
+        Message<PaymentEvent> message = MessageBuilder
+                .withPayload(event)
+                .setHeader(KafkaHeaders.TOPIC, "payment-topic")
                 .build();
         kafkaTemplate.send(message);
     }
 }
-
