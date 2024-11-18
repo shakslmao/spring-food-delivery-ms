@@ -4,6 +4,8 @@ import com.devshaks.delivery.restaurant.Restaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +25,7 @@ public class CuisineTypes {
     private String description;
 
     @Column(nullable = false, columnDefinition = "NUMERIC")
-    private Double price;
+    private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)

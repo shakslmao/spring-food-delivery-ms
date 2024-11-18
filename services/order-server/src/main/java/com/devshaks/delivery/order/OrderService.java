@@ -8,6 +8,7 @@ import com.devshaks.delivery.payments.PaymentFeignClient;
 import com.devshaks.delivery.payments.PaymentRequest;
 import com.devshaks.delivery.restaurant.RestaurantFeignClient;
 import com.devshaks.delivery.restaurant.RestaurantPurchaseRequest;
+import com.devshaks.delivery.restaurant.RestaurantPurchaseResponse;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class OrderService {
     private final KafkaOrderProducer kafkaOrderProducer;
 
     @Transactional
-    public Integer createOrder(@Valid OrderRequest orderRequest) {
+    public Integer createOrderPurchase(@Valid OrderRequest orderRequest) {
         try {
             if (orderRequest.customerId() == null) {
                 throw new BusinessException("Customer ID is required.");
@@ -47,16 +48,26 @@ public class OrderService {
             }
 
             // Fetch restaurant ID from the first item in the list
-            Integer restaurantId = orderRequest.restaurantProducts().get(0).restaurantId();
+            var restaurantProduct = orderRequest.restaurantProducts().get(0);
+            Integer restaurantId = restaurantProduct.restaurantId();
             log.info("Attempting to purchase delivery from restaurant ID: {}", restaurantId);
             log.debug("Purchase request details: {}", orderRequest.restaurantProducts());
 
-            // Create a list of RestaurantPurchaseRequest objects
-            List<RestaurantPurchaseRequest> restaurantPurchaseRequests = orderRequest.restaurantProducts().stream()
-                    .map(product -> new RestaurantPurchaseRequest(product.restaurantId(), product.items()))
-                    .collect(Collectors.toList());
+            boolean isSingleRestaurant = orderRequest.restaurantProducts()
+                    .stream()
+                    .allMatch(product -> product.restaurantId().equals(restaurantId));
 
-            var purchasedProducts = this.restaurantFeignClient.purchaseDelivery(restaurantId, restaurantPurchaseRequests);
+            if (!isSingleRestaurant) {
+                throw new BusinessException("Order contains products from multiple restaurants.");
+            }
+
+            // send a single restaraunt purchase request to restaruant microservice
+            RestaurantPurchaseRequest purchaseRequest = new RestaurantPurchaseRequest(
+                    restaurantId,
+                    restaurantProduct.items()
+            );
+
+            RestaurantPurchaseResponse purchasedProducts = this.restaurantFeignClient.purchaseDelivery(restaurantId, purchaseRequest);
             log.info("Successfully purchased products from restaurant");
 
             // Map order request to Order entity and set status to PENDING
@@ -64,8 +75,8 @@ public class OrderService {
             order.setOrderStatus(OrderStatus.PENDING);
 
             // Create OrderLines and calculate total amount
-            List<OrderLines> items = purchasedProducts.stream()
-                    .flatMap(response -> response.items().stream())
+            List<OrderLines> items = purchasedProducts.items()
+                    .stream()
                     .map(item -> {
                         OrderLines orderLines = new OrderLines();
                         orderLines.setCuisineId(item.cuisineId());
@@ -75,7 +86,8 @@ public class OrderService {
                         orderLines.setTotalPrice(item.price().multiply(BigDecimal.valueOf(item.quantity())));
                         orderLines.setOrder(order);
                         return orderLines;
-                    }).collect(Collectors.toList());
+                    })
+                    .collect(Collectors.toList());
 
             order.setOrderLines(items);
 
@@ -108,7 +120,7 @@ public class OrderService {
                         totalOrderAmount,
                         orderRequest.paymentMethod(),
                         customer,
-                        purchasedProducts));
+                       List.of(purchasedProducts)));
             } catch (Exception kafkaError) {
                 log.error("Error sending order confirmation: ", kafkaError);
                 throw new BusinessException("Error Sending Order Confirmation: " + kafkaError.getMessage());

@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
+// use Resilience4j
+
 @FeignClient(name = "restaurant-service", url = "${application.config.restaurant-service-url}", configuration = FeignConfig.class)
 public interface RestaurantFeignClient {
     @PostMapping("/{restaurantId}/purchase")
-    List<RestaurantPurchaseResponse> purchaseDelivery(@PathVariable("restaurantId") Integer restaurantId, @RequestBody List<RestaurantPurchaseRequest> restaurantPurchaseRequests);
+   RestaurantPurchaseResponse purchaseDelivery(
+           @PathVariable("restaurantId") Integer restaurantId,
+           @RequestBody RestaurantPurchaseRequest restaurantPurchaseRequests);
 }
 

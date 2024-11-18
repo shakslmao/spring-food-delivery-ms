@@ -9,7 +9,6 @@ import java.util.List;
 public record RestaurantPurchaseRequest(
         @NotNull(message = "Restaurant ID is required")
         Integer restaurantId,
-
         @NotNull(message = "Cuisine is required")
         List<CuisinePurchaseRequest> items
 ) {

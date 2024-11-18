@@ -165,26 +165,25 @@ public class RestaurantController {
         return ResponseEntity.ok(newCuisine);
     }
 
-    /**
-     * Endpoint to handle a purchase request from a specific restaurant.
-     *
-     * @param restaurantId
-     *            The ID of the restaurant where the purchase is being made.
-     * @param purchaseRequests
-     *            A list of valid RestaurantPurchaseRequest objects specifying the
-     *            cuisines being purchased.
-     * @return A ResponseEntity containing a list of RestaurantPurchaseResponse
-     *         objects and a 201 CREATED status.
-     */
+
     @PostMapping("/{restaurantId}/purchase")
-    public ResponseEntity<List<RestaurantPurchaseResponse>> handlePurchaseRequest(@PathVariable("restaurantId") Integer restaurantId, @RequestBody @Valid List<RestaurantPurchaseRequest> purchaseRequests) {
-        log.info("Received Purchase Request for ID: {}", restaurantId);
-        log.debug("Purchase request details: {}", purchaseRequests);
-        List<RestaurantPurchaseResponse> responses = restaurantService.handlePurchaseRequest(purchaseRequests, restaurantId);
-        log.info("Successfully processed purchase request for restaurant ID: {}", restaurantId);
-        log.debug("Response details: {}", responses);
-        // Returns a response with the purchase details and the created status
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    public ResponseEntity<RestaurantPurchaseResponse> processPurchase(
+            @PathVariable("restaurantId") Integer restaurantId,
+            @RequestBody @Valid RestaurantPurchaseRequest purchaseRequest) {
+
+        log.info("Received Purchase Request for Restaurant ID: {}", restaurantId);
+        log.debug("Purchase request details: {}", purchaseRequest);
+
+        // Validate and process the request
+        RestaurantPurchaseResponse response = restaurantService.processPurchase(purchaseRequest, restaurantId);
+
+        log.info("Successfully processed purchase request for Restaurant ID: {}", restaurantId);
+        log.debug("Response details: {}", response);
+
+        // Return HTTP 200 OK with the response body
+        return ResponseEntity.ok(response);
     }
+
+
 
 }

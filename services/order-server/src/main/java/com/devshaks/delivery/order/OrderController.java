@@ -22,8 +22,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Integer> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
-        return ResponseEntity.ok(orderService.createOrder(orderRequest));
+    public ResponseEntity<Integer> createOrderPurchase(@RequestBody @Valid OrderRequest orderRequest) {
+        return ResponseEntity.ok(orderService.createOrderPurchase(orderRequest));
     }
 
     // Event Driven Approach Handler

@@ -6,7 +6,6 @@ import com.devshaks.delivery.cuisine.CuisineTypesRepository;
 import com.devshaks.delivery.cuisine.CuisineTypesResponse;
 import com.devshaks.delivery.exceptions.CuisineNotFoundException;
 import com.devshaks.delivery.exceptions.RestaurantNotFoundException;
-import com.devshaks.delivery.exceptions.RestaurantPurchaseException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,171 +51,6 @@ public class RestaurantService {
         cuisineTypesRepository.saveAll(restaurant.getCuisineTypes());
         return savedRestaurant.getId();
     }
-
-
-    /**
-     * Handles the purchase of cuisines from a specific restaurant.
-     *
-     * @param restaurantPurchaseRequests
-     *            A list of requests specifying the restaurant and cuisine(s) to be
-     *            purchased.
-     * @param restaurantId
-     *            The ID of the restaurant where the purchase is being made.
-     * @return A list of RestaurantPurchaseResponse objects containing the
-     *         restaurant and cuisine details.
-     * @throws RestaurantPurchaseException
-     *             If the requests are not for the same restaurant or the restaurant
-     *             is not found.
-     * @throws CuisineNotFoundException
-     *             If any requested cuisine does not exist or does not belong to the
-     *             specified restaurant.
-     */
-
-    /*
-    public List<RestaurantPurchaseResponse> handlePurchaseRequest(List<RestaurantPurchaseRequest> restaurantPurchaseRequests, Integer restaurantId) {
-        try {
-            /*
-            log.info("Processing purchase request for restaurant ID: {}", restaurantId);
-            log.debug("Purchase request details: {}", restaurantPurchaseRequests);
-            // Validates that all the purchase requests are for the same restaurant
-            if (restaurantPurchaseRequests.stream().anyMatch(request -> !request.restaurantId().equals(restaurantId))) {
-                log.error("Validation failed: All purchase requests must be for the same restaurant ID: {}", restaurantId);
-                throw new RestaurantPurchaseException("All purchase requests must be for the same restaurant");
-            }
-
-            log.info("Validating that all purchase requests are for the same restaurant ID: {}", restaurantId);
-            restaurantPurchaseRequests.forEach(request -> {
-                if (request.restaurantId() == null) {
-                    log.error("Null restaurantId found in purchase request: {}", request);
-                    throw new RestaurantPurchaseException("Null restaurantId found in one of the purchase requests");
-                }
-                if (!request.restaurantId().equals(restaurantId)) {
-                    log.error("Validation failed: All purchase requests must be for the same restaurant ID: {}", restaurantId);
-                    throw new RestaurantPurchaseException("All purchase requests must be for the same restaurant");
-                }
-            });
-            log.info("All purchase requests successfully validated for restaurant ID: {}", restaurantId);
-
-            // Attempts to fetch the restaurant from the repository, throws an exception if not found
-            log.info("Fetching restarunt details for ID: {}", restaurantId);
-            Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                    .orElseThrow(() -> {
-                        log.error("Restaurant not found with ID: {}", restaurantId);
-                        return new RestaurantPurchaseException("Restaurant not found");
-                    });
-            log.info("Successfully fetched restaurant details: {}", restaurant);
-
-            // Collects all requested cuisine IDs from the purchase requests
-            log.info("Collecting Cuisine IDs from Purchase Requests");
-            List<Integer> cuisineIds = restaurantPurchaseRequests.stream()
-                    .flatMap(request -> request.items().stream())
-                    .map(RestaurantPurchaseRequest::ite)
-                    .collect(Collectors.toList());
-            log.debug("Collected cuisine IDs: {}", cuisineIds);
-
-
-            // Retrieves all cuisines matching the requested IDs from the repository
-            log.info("Fetching cuisine details for IDs: {}", cuisineIds);
-            List<CuisineTypes> cuisines = cuisineTypesRepository.findAllById(cuisineIds);
-
-            // Checks if any requested cuisines are missing from the fetched list
-            if (cuisines.size() != cuisineIds.size()) {
-                log.warn("Mismatch between requested and found cuisines. Validating missing cuisines.");
-                // Identifies which cuisine IDs were not found
-                List<Integer> foundCuisines = cuisines.stream()
-                        .map(CuisineTypes::getId)
-                        .collect(Collectors.toList());
-                List<Integer> missingCuisines = cuisineIds.stream()
-                        .filter(id -> !foundCuisines.contains(id))
-                        .collect(Collectors.toList());
-                log.error("Cuisine(s) not found with IDs: {}", missingCuisines);
-                throw new CuisineNotFoundException("Cuisine(s) with ID(s) " + missingCuisines + " not found");
-            }
-            log.info("Successfully validated all requested cuisines.");
-
-
-            // Ensures that each fetched cuisine belongs to the specified restaurant
-            cuisines.forEach(cuisine -> {
-                if (!cuisine.getRestaurant().getId().equals(restaurantId)) {
-                    log.error("Validation failed: Cuisine ID {} does not belong to restaurant ID {}", cuisine.getId(), restaurantId);
-                    throw new CuisineNotFoundException("Cuisine type does not belong to the restaurant");
-                }
-            });
-            log.info("Successfully validated all cuisines belong to restaurant ID: {}", restaurantId);
-
-            // Maps the fetched cuisines to their respective RestaurantPurchaseResponse objects
-            log.info("Mapping cuisines to RestaurantPurchaseResponse objects.");
-            List<RestaurantPurchaseResponse> responses = cuisines.stream()
-                    .map(cuisineTypes -> restaurantMapper.toRestaurantPurchaseResponse(restaurant, cuisineTypes))
-                    .collect(Collectors.toList());
-            log.debug("Mapped RestaurantPurchaseResponse objects: {}", responses);
-            log.info("Successfully processed purchase request for restaurant ID: {}", restaurantId);
-            return responses;
-
-        } catch (RestaurantPurchaseException | CuisineNotFoundException e) {
-            log.error("Error while processing purchase request: {}", e.getMessage(), e);
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error occurred while processing purchase request: {}", e.getMessage(), e);
-            throw new RuntimeException("Unexpected error occurred while processing purchase request: " + e.getMessage());
-        }
-    }
-
-     */
-    public List<RestaurantPurchaseResponse> handlePurchaseRequest(
-            List<RestaurantPurchaseRequest> restaurantPurchaseRequests,
-            Integer restaurantId
-    ) {
-        log.info("Validating that all purchase requests are for the same restaurant ID: {}", restaurantId);
-
-        restaurantPurchaseRequests.forEach(request -> {
-            if (request.restaurantId() == null) {
-                log.error("Null restaurantId found in purchase request: {}", request);
-                throw new RestaurantPurchaseException("Null restaurantId found in one of the purchase requests");
-            }
-            if (!request.restaurantId().equals(restaurantId)) {
-                log.error("Validation failed: All purchase requests must be for the same restaurant ID: {}", restaurantId);
-                throw new RestaurantPurchaseException("All purchase requests must be for the same restaurant");
-            }
-        });
-
-        log.info("Fetching restaurant details for ID: {}", restaurantId);
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new RestaurantPurchaseException("Restaurant not found"));
-
-        log.info("Processing cuisine purchases");
-        List<PurchasedItems> purchasedItems = restaurantPurchaseRequests.stream()
-                .flatMap(request -> request.items().stream())
-                .map(cuisinePurchaseRequest -> {
-                    CuisineTypes cuisine = cuisineTypesRepository.findById(cuisinePurchaseRequest.cuisineId())
-                            .orElseThrow(() -> new CuisineNotFoundException("Cuisine not found with ID: " + cuisinePurchaseRequest.cuisineId()));
-                    if (!cuisine.getRestaurant().getId().equals(restaurantId)) {
-                        throw new CuisineNotFoundException("Cuisine does not belong to the specified restaurant");
-                    }
-                    BigDecimal totalPrice = BigDecimal.valueOf(cuisinePurchaseRequest.quantity())
-                            .multiply(BigDecimal.valueOf(cuisine.getPrice()));
-                    return new PurchasedItems(
-                            cuisine.getId(),
-                            cuisine.getName(),
-                            cuisinePurchaseRequest.quantity(),
-                            BigDecimal.valueOf(cuisine.getPrice()),
-                            totalPrice
-                    );
-                })
-                .collect(Collectors.toList());
-
-        BigDecimal orderAmount = purchasedItems.stream()
-                .map(PurchasedItems::totalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return List.of(new RestaurantPurchaseResponse(
-                restaurantId,
-                restaurant.getName(),
-                purchasedItems,
-                OrderStatus.PENDING
-        ));
-    }
-
 
 
     /**
@@ -416,4 +250,74 @@ public class RestaurantService {
 
         restaurant.setCuisineTypes(new ArrayList<>(updatedCuisines));
     }
+
+
+    public RestaurantPurchaseResponse processPurchase(@Valid RestaurantPurchaseRequest purchaseRequest, Integer restaurantId) {
+        log.info("Starting purchase processing for Restaurant ID: {}", restaurantId);
+
+        // Step 1: Validate restaurant
+        log.info("Validating restaurant with ID: {}", restaurantId);
+        var restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found with ID: " + restaurantId));
+        log.debug("Restaurant details: {}", restaurant);
+
+        if (!restaurant.getId().equals(purchaseRequest.restaurantId())) {
+            log.error("Mismatch between path restaurant ID: {} and request restaurant ID: {}", restaurantId, purchaseRequest.restaurantId());
+            throw new IllegalArgumentException("Restaurant ID does not match the purchase request");
+        }
+        log.info("Restaurant validation successful");
+
+        // Step 2: Process purchase items
+        log.info("Processing purchase items for Restaurant ID: {}", restaurantId);
+        List<PurchasedItems> purchasedItems = new ArrayList<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (CuisinePurchaseRequest item : purchaseRequest.items()) {
+            log.debug("Processing item: {}", item);
+
+            // Fetch and validate cuisine
+            var cuisine = cuisineTypesRepository.findById(item.cuisineId())
+                    .orElseThrow(() -> new CuisineNotFoundException("Cuisine not found with ID: " + item.cuisineId()));
+            log.debug("Cuisine details: {}", cuisine);
+
+            // Calculate total for the item
+            BigDecimal itemTotal = cuisine.getPrice().multiply(BigDecimal.valueOf(item.quantity()));
+            totalAmount = totalAmount.add(itemTotal);
+            log.info("Item processed: {} - Quantity: {}, Unit Price: {}, Total Price: {}",
+                    cuisine.getName(), item.quantity(), cuisine.getPrice(), itemTotal);
+
+            // Add to purchased items
+            purchasedItems.add(new PurchasedItems(
+                    item.cuisineId(),
+                    cuisine.getName(),
+                    item.quantity(),
+                    cuisine.getPrice(),
+                    itemTotal));
+        }
+        log.info("All purchase items processed successfully");
+
+        // Step 3: Save restaurant data (if applicable)
+        log.info("Saving restaurant information (if needed) for Restaurant ID: {}", restaurantId);
+        restaurantRepository.save(restaurant);
+        log.info("Restaurant data saved successfully");
+
+        // Step 4: Build response
+        log.info("Building response for purchase");
+        var response = new RestaurantPurchaseResponse(
+                restaurant.getId(),
+                restaurant.getName(),
+                purchasedItems,
+                totalAmount,
+                OrderStatus.CONFIRMED
+        );
+        log.debug("Response details: {}", response);
+
+        log.info("Purchase processing completed for Restaurant ID: {}", restaurantId);
+        return response;
+    }
+
+
+
+
+
 }

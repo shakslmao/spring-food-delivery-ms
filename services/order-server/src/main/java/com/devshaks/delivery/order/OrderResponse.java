@@ -1,5 +1,7 @@
 package com.devshaks.delivery.order;
 
-public record OrderResponse() {
+public record OrderResponse(
+
+) {
 
 }
