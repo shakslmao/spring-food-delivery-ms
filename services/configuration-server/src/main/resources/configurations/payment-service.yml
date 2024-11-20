@@ -1,27 +1,30 @@
 server:
-  port: 8060
+    port: 8060
 spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/paymentdb
-    username: root
-    password: root
-  jpa:
-    hibernate:
-      ddl-auto: create
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://localhost:5432/paymentsdb
+        username: root
+        password: root
+    jpa:
+        hibernate:
+            ddl-auto: create
+        database: postgresql
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-  kafka:
-    producer:
-      bootstrap-servers: localhost:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.type.mapping: paymentEvent:com.devshaks.delivery.kafka.PaymentEvent
+    kafka:
+        producer:
+            bootstrap-servers: localhost:9092
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            properties:
+                spring.json.type.mapping: paymentEvent:com.devshaks.delivery.kafka.PaymentEvent
 
-
+    stripe:
+        api:
+            public-api: ${STRIPE_PUBLIC_API_KEY}
+            secret-api: ${STRIPE_SECRET_API_KEY}
 
 application:
-  config:
-    restaurant-service-url: http://localhost:8222/api/v1/restaurants
+    config:
+        restaurant-service-url: http://localhost:8222/api/v1/restaurants

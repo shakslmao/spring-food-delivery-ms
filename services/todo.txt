@@ -1,4 +1,12 @@
-Notification Service:
+1. payment database only storing one ID! - fix!
+2. add endpoints for customer to view their orders & payment history.
+3. add stripe and add a little front end for it.
+4. add redis for caching
+5. you can purchase from one restaurant with a cuisine from another. fix this.
+
+
+
+Notification Service
 Handles notifications (e.g., order confirmations, delivery updates) via various channels such as SMS, email, or push notifications.
 This can also integrate with Kafka to listen for events and send notifications accordingly.]
 
@@ -12,7 +20,6 @@ User Profile Service:
 Manages customer data such as addresses, preferences, and saved payment methods. This service can ensure personalized experiences and easy reordering.
 
 Recommendation Service: Provides personalized or popular item recommendations to users based on their past orders or general trends.
-
 
 Technologies to implement:
 ELK Stack (Elasticsearch, Logstash, Kibana):
