@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -22,8 +21,13 @@ import java.util.UUID;
 @Table(name = "payments")
 public class Payments {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    private Integer customerId;
+
+    @Column(name = "stripe_payment_id", nullable = true)
+    private String stripePaymentId;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
